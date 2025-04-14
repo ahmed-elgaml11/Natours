@@ -1,6 +1,7 @@
 import express from "express";
 import firstResponse from "../interfaces/firstResponse";
-import something from './tours/tour.routes'
+import tourRoutes from './tours/tour.routes'
+import userRoutes from './tours/tour.routes'
 const router = express.Router();
 
 router.get<{}, firstResponse>('/', (req, res) => {
@@ -9,5 +10,6 @@ router.get<{}, firstResponse>('/', (req, res) => {
     })
 })
 
-router.use('/something', something)
+router.use('/tours', tourRoutes)
+router.use('/users', userRoutes)
 export default router

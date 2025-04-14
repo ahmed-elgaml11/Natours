@@ -2,11 +2,9 @@ import express from 'express';
 import dotenv from 'dotenv';
 import path from 'path'
 dotenv.config({path: path.join(__dirname, '../config.env')})
-
-
-import firstResponse from './interfaces/firstResponse';
+import { AppError } from './utils/appError'; 
+import firstResponse from './types/firstResponse';
 import api from './api'
-import notFound from './middlewares/notFound';
 import errorHandler from './middlewares/errorHandler';
 
 
@@ -25,7 +23,9 @@ app.get<{}, firstResponse>('/', (req, res) => {
 
 app.use('/api/v1', api)
 
-app.use(notFound)
+app.all('*', (req, res, next) => {
+    next(new AppError(`Not Found - ${req.originalUrl}`, 404))
+})
 app.use(errorHandler)
 
 export default app;

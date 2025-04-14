@@ -1,7 +1,7 @@
 import express from "express";
-import firstResponse from "../interfaces/firstResponse";
+import firstResponse from "../types/firstResponse";
 import tourRoutes from './tours/tour.routes'
-import userRoutes from './tours/tour.routes'
+import userRoutes from './users/user.routes'
 const router = express.Router();
 
 router.get<{}, firstResponse>('/', (req, res) => {

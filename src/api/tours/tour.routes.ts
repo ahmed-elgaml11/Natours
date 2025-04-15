@@ -1,6 +1,6 @@
 import express from "express";
 const router = express.Router();
-import tourControllers from './tour.controller'
+import * as tourControllers from './tour.controller'
 
 
 router

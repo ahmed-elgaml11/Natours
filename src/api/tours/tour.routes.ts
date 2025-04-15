@@ -8,13 +8,13 @@ import { tourSchema } from "./tour.schema";
 router
     .route('/')
     .get(tourControllers.getAllTours)
-    .post(validateRequest(tourSchema), tourControllers.addTour)
+    .post(validateRequest(tourSchema, ['body']), tourControllers.addTour)
 
 router 
     .route('/:id')
-    .get(tourControllers.getTour)
-    .patch(tourControllers.updateTour)
-    .delete(tourControllers.deleteTour)
+    .get(validateRequest(tourSchema, ['params']), tourControllers.getTour)
+    .patch(validateRequest(tourSchema, ['params', 'halfBody']), tourControllers.updateTour)
+    .delete(validateRequest(tourSchema, ['params']), tourControllers.deleteTour)
 
 
 export default router

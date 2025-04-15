@@ -36,3 +36,5 @@ export const tourSchema = z.object({
   startDates: z.array(z.coerce.date()).optional(),
   secretTour: z.boolean().default(false),
 });
+
+export type tourType = z.infer<typeof tourSchema >

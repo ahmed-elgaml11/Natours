@@ -1,6 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
 import {errorResponse, CustomError } from '../types/errorResponse';
-import  mongoose  from 'mongoose';
 import { AppError } from '../utils/appError';
 
 const handleCastErrorDb = (err: CustomError) => {

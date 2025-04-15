@@ -5,7 +5,7 @@ import userRoutes from './users/user.routes'
 const router = express.Router();
 
 router.get<{}, firstResponse>('/', (req, res) => {
-    res.json({
+    res.status(200).json({
         message: 'hello from api.'
     })
 })

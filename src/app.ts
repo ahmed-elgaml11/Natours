@@ -14,7 +14,7 @@ app.use(express.json());
 
 
 app.get<{}, firstResponse>('/', (req, res) => {
-    res.json({
+    res.status(200).json({
         message: 'hello from the root'
     })
 })

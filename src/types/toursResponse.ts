@@ -3,6 +3,7 @@ export interface toursResponse {
     status?: string,
     results?: number,
     data?: {
-        tours: ITour[] 
+        tours?: ITour[],
+        tour?: ITour
     } 
 }

@@ -1,6 +1,15 @@
 import mongoose from "mongoose";
 import validator from "validator";
-const userSchema = new mongoose.Schema({
+interface IUser {
+    name: string;
+    email: string;
+    photo?: string;
+    role: 'user' | 'guide' | 'lead-guide' | 'admin';
+    password: string;
+    passwordConfirm: string;
+}
+
+const userSchema = new mongoose.Schema<IUser>({
     name: {
         type: String,
         required: [true, 'Please tell us your name!']
@@ -29,4 +38,4 @@ const userSchema = new mongoose.Schema({
         required: [true, 'Please confirm your password'],
     }
 })
-export const User = mongoose.model('User', userSchema)
+export const User = mongoose.model<IUser>('User', userSchema)

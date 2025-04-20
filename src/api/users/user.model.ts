@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 import validator from "validator";
-interface IUser {
+export interface IUser {
     name: string;
     email: string;
     photo?: string;

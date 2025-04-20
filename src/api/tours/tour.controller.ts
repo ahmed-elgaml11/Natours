@@ -47,7 +47,7 @@ export const getTour = catchAsync(async(req: Request<{id: string}, toursResponse
 
 
 })
-export const updateTour = catchAsync(async(req: Request<{id: string}, updatedTourType >, res: Response<toursResponse>, next: NextFunction) => {
+export const updateTour = catchAsync(async(req: Request<{id: string}, toursResponse, updatedTourType >, res: Response<toursResponse>, next: NextFunction) => {
     const {id} = req.params
     const updateTour = await Servises.updateTour(id, req.body);
     if(!updateTour){

@@ -50,7 +50,7 @@ export const validateRequest = (
 
             if (!result.success) {
                 const messages = result.error.errors
-                    .map((err) => `${err.path.join('.')}: ${err.message}`)
+                    .map((err) => `${err.path.slice(-1)[0]}: ${err.message}`)
                     .join(',  ');
                 throw new AppError(`Validation Error: ${messages || 'Validation Failed'}`, 400);
             }

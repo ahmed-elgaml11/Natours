@@ -1,5 +1,5 @@
 import mongoose from 'mongoose';
-import Tour from '../api/tours/tour.model'
+import {Tour} from '../api/tours/tour.model'
 import fs from 'fs';
 import dotenv from 'dotenv';
 import path from 'path'

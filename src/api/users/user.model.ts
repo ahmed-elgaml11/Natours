@@ -5,7 +5,7 @@ export interface IUser {
     name: string;
     email: string;
     photo?: string;
-    role: 'user' | 'guide' | 'lead-guide' | 'admin';
+    role?: 'user' | 'guide' | 'lead-guide' | 'admin';
     password: string;
     passwordConfirm: string;
 }

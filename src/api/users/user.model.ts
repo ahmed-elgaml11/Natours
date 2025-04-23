@@ -1,7 +1,17 @@
 import mongoose from "mongoose";
 import validator from "validator";
 import bcrypt from 'bcrypt'
+import { string } from "zod";
 export interface IUser {
+    name: string;
+    email: string;
+    photo?: string;
+    role?: 'user' | 'guide' | 'lead-guide' | 'admin';
+    password: string;
+    passwordConfirm: string;
+    correctPassword: (pass1: string, pass2: string) => Promise<boolean>
+}
+export interface IUserInput {
     name: string;
     email: string;
     photo?: string;
@@ -52,4 +62,8 @@ userSchema.pre('save', async function(next){
     next();
 
 })
+// instance method
+userSchema.methods.correctPassword = async (userPassword: string, hashedPassword: string) => {
+    return bcrypt.compare(userPassword, hashedPassword)
+}
 export const User = mongoose.model<IUser>('User', userSchema)

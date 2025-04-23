@@ -55,3 +55,14 @@ export const updateUserSchema = z.object({
     body: updateUserBodySchema,
     params: userIdSchema,
 }).strict();
+
+export const loginUserSchema = z.object({
+    body: z.object({
+        email: z
+        .string()
+        .min(1, { message: 'Please provide your email' })
+        .email({ message: 'Please provide a valid email' }),
+        password: z.string()
+    }).strict(),
+    params: z.object({})
+}).strict()

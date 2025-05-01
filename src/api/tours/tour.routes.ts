@@ -6,6 +6,7 @@ import { tourSchema } from "./tour.schema";
 import { topTours } from "../../middlewares/tours/topTouts";
 
 router.get('/top-5-tours', topTours, tourControllers.getAllTours)   //limit=5&sort=-ratingAverages,price
+router.get('/tour-stats', tourControllers.tourStats )                    //aggredation pipeline
 
 router
     .route('/')

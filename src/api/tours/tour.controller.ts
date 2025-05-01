@@ -17,8 +17,6 @@ export const getAllTours = catchAsync(async (req: Request, res: Response<toursRe
     const tours = await features.query
 
 
-
-
     res.status(200).json({
         status: 'success',
         results: tours.length,
@@ -86,6 +84,16 @@ export const deleteTour = catchAsync(async (req: Request, res: Response<toursRes
         }
     });
 
+})
 
+export const tourStats = catchAsync(async (req: Request, res: Response<toursResponse>, next: NextFunction) => {
+    const stats = await Servises.tourStats();
+    res.status(200).json({
+        status: 'success',
+        data: {
+            stats
+        }
+    })
 
 })
+

@@ -26,3 +26,25 @@ export const deletedTour = async (id: string ) => {
     return await Tour.findByIdAndDelete(id)
 }
 
+export const tourStats = async () => {          //  //aggredation pipeline
+    const stats = Tour.aggregate([
+        {
+            $match: { ratingsAverage: { $gte: 4} }
+        },
+        {
+            $group: {
+                _id: { $toUpper: '$difficulty' },
+                numTours: { $sum: 1 },
+                numRatings: { $sum: '$ratingsQuantity' },
+                avgRating: { $avg: '$ratingsAverage' },
+                avgPrice: { $avg: '$price' },
+                minPrice: { $min: '$price' },
+                maxPrice: { $max: '$price' }
+            }
+        },
+        {
+            $sort: { minPrice: 1 }
+        }
+    ])
+    return stats
+}

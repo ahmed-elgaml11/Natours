@@ -3,7 +3,9 @@ const router = express.Router();
 import * as tourControllers from './tour.controller'
 import { validateRequest } from '../../middlewares/validateRequest'
 import { tourSchema } from "./tour.schema";
+import { topTours } from "../../middlewares/tours/topTouts";
 
+router.get('/top-5-tours', topTours, tourControllers.getAllTours)   //limit=5&sort=-ratingAverages,price
 
 router
     .route('/')

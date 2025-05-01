@@ -6,11 +6,11 @@ import { AppError } from '../../utils/appError';
 import { ITour, Tour } from './tour.model'
 import { updatedTourType } from './tour.schema'
 
-export const getAllTours = catchAsync(async(req: Request, res: Response<toursResponse>, next: NextFunction) => {
+export const getAllTours = catchAsync(async (req: Request, res: Response<toursResponse>, next: NextFunction) => {
     // filtering
-    const queryObj = {...req.query}
+    const queryObj = { ...req.query }
     const excludedFields = ['sort', 'page', 'limit', 'fields']
-    excludedFields.forEach((ele) => delete queryObj[ele]) 
+    excludedFields.forEach((ele) => delete queryObj[ele])
 
     //advanced filtering         ?age[gte]=10
     let queryStr = JSON.stringify(queryObj)
@@ -19,18 +19,18 @@ export const getAllTours = catchAsync(async(req: Request, res: Response<toursRes
     let query = Tour.find(JSON.parse(queryStr))
 
     //sort ('name age')                              ?sort=duration,name
-    if(req.query.sort && typeof req.query.sort ==='string' ){
+    if (req.query.sort && typeof req.query.sort === 'string') {
         const sortedBy = req.query.sort.split(',').join(' ')
         query = query.sort(sortedBy)
-    }else{
+    } else {
         query = query.sort('-createdAt')
     }
 
     // fields limiting: select(-name age)              ?fields=duration,name
-    if(req.query.fields && typeof req.query.fields ==='string'){
+    if (req.query.fields && typeof req.query.fields === 'string') {
         const fields = req.query.fields.split(',').join(' ')
         query = query.select(fields)
-    }else{
+    } else {
         query = query.select('-__v')
     }
 
@@ -43,10 +43,10 @@ export const getAllTours = catchAsync(async(req: Request, res: Response<toursRes
 
     query.skip(skip).limit(limit)
 
-    if(req.query.page){
+    if (req.query.page) {
         const tourNums = await Tour.countDocuments()
-        if(skip >= tourNums)  throw new AppError('this page dosnt exist', 404);
-        
+        if (skip >= tourNums) throw new AppError('this page dosnt exist', 404);
+
     }
 
     // execute Query
@@ -61,13 +61,13 @@ export const getAllTours = catchAsync(async(req: Request, res: Response<toursRes
         results: tours.length,
         data: {
             tours: tours
-        } 
+        }
     })
 })
-export const addTour = catchAsync(async(req: Request<{}, toursResponse, ITour>, res: Response<toursResponse>, next: NextFunction) => {
-    const {name} =  req.body
+export const addTour = catchAsync(async (req: Request<{}, toursResponse, ITour>, res: Response<toursResponse>, next: NextFunction) => {
+    const { name } = req.body
     const existingTour = await Servises.getTour(name);
-    if(existingTour){
+    if (existingTour) {
         throw new AppError('unavailable Tour name, choose another one!.', 400)
     }
     const newTour = await Servises.addTour(req.body);
@@ -78,10 +78,10 @@ export const addTour = catchAsync(async(req: Request<{}, toursResponse, ITour>, 
         }
     })
 })
-export const getTour = catchAsync(async(req: Request<{id: string}, toursResponse, {}>, res: Response<toursResponse>, next: NextFunction) => {
-    const {id} = req.params
+export const getTour = catchAsync(async (req: Request<{ id: string }, toursResponse, {}>, res: Response<toursResponse>, next: NextFunction) => {
+    const { id } = req.params
     const tour = await Servises.getTourbyId(id);
-    if(!tour){
+    if (!tour) {
         throw new AppError('No tour found with that ID', 404);
     }
 
@@ -94,10 +94,10 @@ export const getTour = catchAsync(async(req: Request<{id: string}, toursResponse
 
 
 })
-export const updateTour = catchAsync(async(req: Request<{id: string}, toursResponse, updatedTourType >, res: Response<toursResponse>, next: NextFunction) => {
-    const {id} = req.params
+export const updateTour = catchAsync(async (req: Request<{ id: string }, toursResponse, updatedTourType>, res: Response<toursResponse>, next: NextFunction) => {
+    const { id } = req.params
     const updateTour = await Servises.updateTour(id, req.body);
-    if(!updateTour){
+    if (!updateTour) {
         throw new AppError('No tour found with that ID', 404);
     }
     res.status(200).json({
@@ -109,10 +109,10 @@ export const updateTour = catchAsync(async(req: Request<{id: string}, toursRespo
 
 
 })
-export const deleteTour = catchAsync(async(req: Request, res: Response<toursResponse>, next: NextFunction) => {
-    const {id} = req.params
+export const deleteTour = catchAsync(async (req: Request, res: Response<toursResponse>, next: NextFunction) => {
+    const { id } = req.params
     const deletedTour = await Servises.deletedTour(id);
-    if(!deletedTour){
+    if (!deletedTour) {
         throw new AppError('No tour found with that ID', 404);
     }
 
@@ -122,7 +122,7 @@ export const deleteTour = catchAsync(async(req: Request, res: Response<toursResp
 
         }
     });
-    
+
 
 
 })

@@ -17,7 +17,7 @@ export class APIFeatures {
         let queryString = JSON.stringify(queryObj)
         queryString = queryString.replace(/\b(gt|gte|lt|lte)\b/g, (match) => `$${match}`)
 
-        this.query.find(JSON.parse(queryString))
+        this.query = this.query.find(JSON.parse(queryString))
 
         return this
 

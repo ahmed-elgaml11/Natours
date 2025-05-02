@@ -6,6 +6,7 @@ import { AppError } from '../../utils/appError';
 import { ITour, Tour } from './tour.model'
 import { updatedTourType } from './tour.schema'
 import { APIFeatures } from '../../utils/queryFeatures';
+import { number } from 'zod';
 
 export const getAllTours = catchAsync(async (req: Request, res: Response<toursResponse>, next: NextFunction) => {
     const features =  new APIFeatures(Tour.find(), req.query)
@@ -92,6 +93,19 @@ export const tourStats = catchAsync(async (req: Request, res: Response<toursResp
         status: 'success',
         data: {
             stats
+        }
+    })
+
+})
+
+export const monthlyPlan = catchAsync(async (req: Request, res: Response<toursResponse>, next: NextFunction) => {
+    const year = Number(req.params.year);
+    const plan = await Servises.monthlyPlan(year)
+
+    res.status(200).json({
+        status: 'success',
+        data: {
+            plan
         }
     })
 

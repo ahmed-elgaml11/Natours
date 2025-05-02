@@ -7,5 +7,7 @@ export interface toursResponse {
         tours?: ITour[],
         tour?: ITour,
         stats?: any[]
+        plan?: any[
+        ]
     } 
 }

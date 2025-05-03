@@ -1,4 +1,6 @@
 import mongoose from "mongoose";
+import slugify from "slugify";
+import { date } from "zod";
 export interface ITour {
     name: string;
     slug?: string;
@@ -92,5 +94,17 @@ const tourSchema = new mongoose.Schema<ITour>({
 tourSchema.virtual('weekDuration').get(function(){
     return this.duration / 7 ;
 })
+// document middleware
+tourSchema.pre('save', function(next){
+    this.slug = slugify(this.name, { lower: true })
+    next()
+})
+
+//query middleware
+tourSchema.pre('find', function(next){
+    this.find({ secretTour: { $ne: true } })
+    next()
+})
+
 
 export const Tour = mongoose.model<ITour>('Tour', tourSchema)

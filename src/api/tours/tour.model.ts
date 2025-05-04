@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
 import { Query } from "mongoose";
 import slugify from "slugify";
+
 export interface ITour {
     name: string;
     slug?: string;

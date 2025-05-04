@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
+import { Query } from "mongoose";
 import slugify from "slugify";
-import { date } from "zod";
 export interface ITour {
     name: string;
     slug?: string;
@@ -60,7 +60,13 @@ const tourSchema = new mongoose.Schema<ITour>({
         required: [true, 'A tour must have a price']
     },
     priceDiscount: {
-        type: Number
+        type: Number,
+        validate: {
+            validator: function(val){
+                return val < this.price
+            },
+            message: 'Discount price should be lower than regular price'
+        }
     },
     summary: {
         type: String,
@@ -87,22 +93,39 @@ const tourSchema = new mongoose.Schema<ITour>({
         default: false
     }
 }, {
-    toJSON: { virtuals: true }, 
+    toJSON: { virtuals: true },
     toObject: { virtuals: true }
 }
 );
-tourSchema.virtual('weekDuration').get(function(){
-    return this.duration / 7 ;
+tourSchema.virtual('weekDuration').get(function () {
+    return this.duration / 7;
 })
 // document middleware
-tourSchema.pre('save', function(next){
+tourSchema.pre('save', function (next) {
     this.slug = slugify(this.name, { lower: true })
     next()
 })
 
 //query middleware
-tourSchema.pre('find', function(next){
-    this.find({ secretTour: { $ne: true } })
+tourSchema.pre(/^find/, function (this: Query<any, any>, next) {
+    this.find({ secretTour: { $ne: true } });
+    this.setOptions({ start: Date.now() });
+    next();
+});
+tourSchema.post(/^find/, function (this: Query<any, any>, docs, next) {
+    const start = this.getOptions().start
+    if (start) {
+        console.log(`This query took ${Date.now() - start} milliseconds`);
+    }
+    next();
+})
+
+// aggregate middleware
+
+tourSchema.pre('aggregate', function (next) {
+    this.pipeline().unshift({
+        $match: { secretTour: { $ne: true } }
+    })
     next()
 })
 

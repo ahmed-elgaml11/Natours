@@ -3,11 +3,11 @@ const router = express.Router();
 // import * as userController from './user.controller'
 import * as authController from './auth.controller'
 import { validateRequest } from "../../middlewares/validateRequest";
-import { createUserSchema, getUserSchema, updateUserSchema, loginUserSchema } from "./user.schema";
+import { createUserSchema, getUserSchema, updateUserSchema, createUserLoginSchema } from "./user.schema";
 
 
 router.post('/signup', validateRequest(createUserSchema), authController.signup)
-router.post('/login', validateRequest(loginUserSchema), authController.login)
+router.post('/login', validateRequest(createUserLoginSchema), authController.login)
 // router
 //     .route('/')
 //     .get(userController.getUsere)

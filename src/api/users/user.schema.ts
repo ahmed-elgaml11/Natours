@@ -57,12 +57,16 @@ export const updateUserSchema = z.object({
 }).strict();
 
 export const loginUserSchema = z.object({
-    body: z.object({
-        email: z
-        .string()
-        .min(1, { message: 'Please provide your email' })
-        .email({ message: 'Please provide a valid email' }),
-        password: z.string()
-    }).strict(),
+    email: z
+    .string()
+    .min(1, { message: 'Please provide your email' })
+    .email({ message: 'Please provide a valid email' }),
+    password: z.string()
+}).strict()
+
+export type LoginType = z.infer<typeof loginUserSchema >
+
+export const createUserLoginSchema = z.object({
+    body: loginUserSchema,
     params: z.object({})
 }).strict()

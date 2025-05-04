@@ -5,7 +5,12 @@ import { IUser, IUserInput } from './user.model';
 import { catchAsync } from '../../utils/catchAsync';
 import { AppError } from '../../utils/appError';
 import { signToken } from '../../utils/jwt';
+import { LoginType } from './user.schema';
 export const signup = catchAsync(async (req: Request<{}, userResponce, IUserInput>, res: Response<userResponce>, next: NextFunction) => {
+    const existUser = await Services.findUser(req.body.email)
+    if(existUser){
+        throw new AppError('this email is already exists, choose another one.', 400)
+    }
     const user = await Services.createUser({
         name: req.body.name,
         email: req.body.email,
@@ -13,7 +18,8 @@ export const signup = catchAsync(async (req: Request<{}, userResponce, IUserInpu
         passwordConfirm: req.body.passwordConfirm
     })
     const token : string = signToken({id: user._id})
-    
+
+    user.password = undefined as unknown as string
     res.status(201).json({
         status: 'success',
         token,
@@ -25,7 +31,7 @@ export const signup = catchAsync(async (req: Request<{}, userResponce, IUserInpu
 
 })
 
-export const login = catchAsync (async (req: Request<{}, userResponce>, res: Response<userResponce>, next: NextFunction) => {
+export const login = catchAsync (async (req: Request<{}, userResponce, LoginType>, res: Response<userResponce>, next: NextFunction) => {
     const {email, password} = req.body;
 
     const user = await Services.findUser(email);

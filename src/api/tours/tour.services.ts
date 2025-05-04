@@ -48,7 +48,7 @@ export const tourStats = async () => {          //  //aggredation pipeline
     ])
     return stats
 }
-// here i want informatin for each month to get the best month has tours so i want a field has a month to group by it but startingDates fild is array so there is '$unwind' stage it deconstruct the array and output document for each element in the array
+// here i want informatin for each month to get the best month has tours so i want a field has a month to group by it but startingDates field is array so there is '$unwind' stage it deconstruct the array and output document for each element in the array
 export const monthlyPlan = async (year: number) => {
     const plan = Tour.aggregate([
         {

@@ -1,7 +1,6 @@
 import mongoose from "mongoose";
 import validator from "validator";
 import bcrypt from 'bcrypt'
-import { string } from "zod";
 export interface IUser {
     name: string;
     email: string;
@@ -10,6 +9,8 @@ export interface IUser {
     password: string;
     passwordConfirm: string;
     correctPassword: (pass1: string, pass2: string) => Promise<boolean>
+    passwordChangedAt?: Date,
+    changePasswordAfter: (tokenTime: number) => boolean
 }
 export interface IUserInput {
     name: string;
@@ -18,6 +19,7 @@ export interface IUserInput {
     role?: 'user' | 'guide' | 'lead-guide' | 'admin';
     password: string;
     passwordConfirm: string;
+    passwordChangedAt?: Date,
 }
 
 const userSchema = new mongoose.Schema<IUser>({
@@ -48,15 +50,16 @@ const userSchema = new mongoose.Schema<IUser>({
         type: String,
         required: [true, 'Please confirm your password'],
         validate: {
-            validator: function(ele){
-                return ele===this.password;
-            }, 
+            validator: function (ele) {
+                return ele === this.password;
+            },
             message: 'passwords don\'t match'
         },
-    }
+    },
+    passwordChangedAt: Date
 })
-userSchema.pre('save', async function(next){
-    if(!this.isModified('password'))  return next();
+userSchema.pre('save', async function (next) {
+    if (!this.isModified('password')) return next();
     this.password = await bcrypt.hash(this.password, 12);
     this.passwordConfirm = undefined as unknown as string;
     next();
@@ -66,4 +69,13 @@ userSchema.pre('save', async function(next){
 userSchema.methods.correctPassword = async (userPassword: string, hashedPassword: string) => {
     return bcrypt.compare(userPassword, hashedPassword)
 }
+
+userSchema.methods.changePasswordAfter = function (JWTTimestamp: number) {
+    if (this.passwordChangedAt) {
+        this.passwordChangedAt = new Date(this.passwordChangedAt);
+        const changedTimestamp = Math.floor(this.passwordChangedAt.getTime() / 1000);
+        return changedTimestamp > JWTTimestamp;
+    }
+    return false;
+};
 export const User = mongoose.model<IUser>('User', userSchema)

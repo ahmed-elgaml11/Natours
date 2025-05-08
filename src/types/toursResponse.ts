@@ -1,4 +1,4 @@
-import {ITour} from '../api/tours/tour.model'
+import { ITour } from '../api/tours/tour.model'
 import mongoose from 'mongoose'
 export interface toursResponse {
     status?: string,
@@ -7,7 +7,6 @@ export interface toursResponse {
         tours?: ITour[],
         tour?: ITour,
         stats?: any[]
-        plan?: any[
-        ]
-    } 
+        plan?: any[]
+    }
 }

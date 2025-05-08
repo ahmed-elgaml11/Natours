@@ -35,3 +35,13 @@ export const protect = catchAsync(async (req: Request, res: Response, next: Next
     next()
 
 })
+
+export const restrictTo = (roles: ('user' | 'guide' | 'lead-guide' | 'admin')[]) => {
+    return (req: Request, res: Response, next: NextFunction) => {
+        if (!req.user || !roles.includes(req.user.role!)) {
+            return next(new AppError('you do not have permission to perform this action', 403))
+        }
+
+        next()
+    }
+}

@@ -26,9 +26,9 @@ export const protect = catchAsync(async (req: Request, res: Response, next: Next
 
 
     // 4- check if the user changes the password after token is issued
-    // if (user.changePasswordAfter(decoded.iat)) {
-    //     return next(new AppError('User recently changed the password, please log in again', 401))
-    // }
+    if (user.changePasswordAfter(decoded.iat!)) {
+        return next(new AppError('User recently changed the password, please log in again', 401))
+    }
 
     req.user = user
 

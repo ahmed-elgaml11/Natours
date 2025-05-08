@@ -11,6 +11,7 @@ const userBodySchema = z.object({
         .string()
         .min(8, { message: 'Password must be at least 8 characters long' }),
     passwordConfirm: z.string().min(8, { message: 'Please confirm your password' }),
+    passwordChangedAt: z.string().optional()
 }).strict();
 
 const userIdSchema = z.object({

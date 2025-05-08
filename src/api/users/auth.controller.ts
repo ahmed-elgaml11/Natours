@@ -15,7 +15,8 @@ export const signup = catchAsync(async (req: Request<{}, userResponce, IUserInpu
         name: req.body.name,
         email: req.body.email,
         password: req.body.password,
-        passwordConfirm: req.body.passwordConfirm
+        passwordConfirm: req.body.passwordConfirm,
+        passwordChangedAt: req.body.passwordChangedAt
     })
     const token : string = signToken({id: user._id})
 

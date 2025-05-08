@@ -1,4 +1,4 @@
-import jwt, { SignOptions, JwtPayload,  } from "jsonwebtoken"
+import jwt, { SignOptions, JwtPayload, } from "jsonwebtoken"
 import { AppError } from "./appError";
 import mongoose from "mongoose";
 import { promisify } from "util";
@@ -19,7 +19,7 @@ export const signToken = (payload: payloadDate) => {
 
 const verify = promisify(jwt.verify) as (token: string, secret: string) => Promise<JwtPayload>;
 
-export const verifyToken = async (token: string ) : Promise<JwtPayload> => {
+export const verifyToken = async (token: string): Promise<JwtPayload> => {
   const { JWT_SECRET } = process.env;
   if (!JWT_SECRET) {
     throw new AppError('JWT env variables are not defined', 500)

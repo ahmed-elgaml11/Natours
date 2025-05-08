@@ -11,9 +11,16 @@ const userBodySchema = z.object({
         .string()
         .min(8, { message: 'Password must be at least 8 characters long' }),
     passwordConfirm: z.string().min(8, { message: 'Please confirm your password' }),
-    passwordChangedAt: z.string().optional()
-}).strict();
-
+    passwordChangedAt: z.preprocess((arg) => {
+        if (typeof arg === 'string' || typeof arg === 'number') {
+            const date = new Date(arg)
+            return isNaN(date.getTime()) ? 'undefined' : date
+        }
+        return arg;
+    },
+        z.date().optional()
+    )
+}).strict()
 const userIdSchema = z.object({
     id: z.string().regex(/^[0-9a-fA-F]{24}$/, { message: 'Invalid MongoDB ObjectId' })
 }).strict();;
@@ -59,13 +66,13 @@ export const updateUserSchema = z.object({
 
 export const loginUserSchema = z.object({
     email: z
-    .string()
-    .min(1, { message: 'Please provide your email' })
-    .email({ message: 'Please provide a valid email' }),
+        .string()
+        .min(1, { message: 'Please provide your email' })
+        .email({ message: 'Please provide a valid email' }),
     password: z.string()
 }).strict()
 
-export type LoginType = z.infer<typeof loginUserSchema >
+export type LoginType = z.infer<typeof loginUserSchema>
 
 export const createUserLoginSchema = z.object({
     body: loginUserSchema,

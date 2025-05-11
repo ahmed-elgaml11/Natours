@@ -3,11 +3,16 @@ const router = express.Router();
 // import * as userController from './user.controller'
 import * as authController from './auth.controller'
 import { validateRequest } from "../../middlewares/validateRequest";
-import { createUserSchema, getUserSchema, updateUserSchema, createUserLoginSchema } from "./user.schema";
+import { createUserSchema, getUserSchema, updateUserSchema, createUserLoginSchema, userForgetPasswordSchema} from "./user.schema";
 
 
 router.post('/signup', validateRequest(createUserSchema), authController.signup)
 router.post('/login', validateRequest(createUserLoginSchema), authController.login)
+
+router.post('/forgetPassword', validateRequest(userForgetPasswordSchema), authController.forgetPassword)
+router.post('/resetPassword/:token', validateRequest(createUserLoginSchema), authController.resetPassword)
+
+
 // router
 //     .route('/')
 //     .get(userController.getUsere)

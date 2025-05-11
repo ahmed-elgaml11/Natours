@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 import validator from "validator";
 import bcrypt from 'bcrypt'
 import crypto from 'crypto'
-export interface IUser {
+export interface IUser  {
     name: string;
     email: string;
     photo?: string;
@@ -60,7 +60,7 @@ const userSchema = new mongoose.Schema<IUser>({
             message: 'passwords don\'t match'
         },
     },
-    passwordChangedAt: Date,
+    passwordChangedAt: Date ,
 
     PasswordResetToken: String,
 
@@ -73,6 +73,15 @@ userSchema.pre('save', async function (next) {
     next();
 
 })
+
+userSchema.pre('save', function (next){
+    if (!this.isModified('password') || this.isNew)  return next()
+
+    this.passwordChangedAt = new Date (Date.now() - 1000)
+    next()
+
+})
+
 // instance method
 userSchema.methods.correctPassword = async (userPassword: string, hashedPassword: string) => {
     return bcrypt.compare(userPassword, hashedPassword)

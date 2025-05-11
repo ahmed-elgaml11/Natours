@@ -5,8 +5,12 @@ import { IUser, IUserInput } from './user.model';
 import { catchAsync } from '../../utils/catchAsync';
 import { AppError } from '../../utils/appError';
 import { signToken } from '../../utils/jwt';
-import { LoginType, Email } from './user.schema';
+import { LoginType, Email,ResetPassword } from './user.schema';
 import { sendEmail } from '../../utils/email';
+import crypto from 'crypto'
+
+
+
 export const signup = catchAsync(async (req: Request<{}, userResponce, IUserInput>, res: Response<userResponce>, next: NextFunction) => {
     const existUser = await Services.findUser(req.body.email)
     if (existUser) {
@@ -73,7 +77,7 @@ export const forgetPassword = catchAsync(async (req: Request<{}, userResponce, E
 
         await sendEmail({
             email: user.email,
-            subject: 'this link token is valid for 10 minutes only',
+            subject: 'this link is valid for 10 minutes only',
             message
         })
 
@@ -94,7 +98,32 @@ export const forgetPassword = catchAsync(async (req: Request<{}, userResponce, E
     }
 
 })
-export const resetPassword = catchAsync(async (req: Request<{}, userResponce, IUser>, res: Response<userResponce>, next: NextFunction) => {
+export const resetPassword = catchAsync(async (req: Request<{ token: string }, userResponce, ResetPassword>, res: Response<userResponce>, next: NextFunction) => {
+    //1- get the user based on the token
+    const token = req.params.token
+    const hashedToken = crypto.createHash('sha256').update(token).digest('hex')
+    const user = await Services.findUserByToken(hashedToken)
+
+
+    //2- if the user exists and the token is not expired , set the new password and update change password at
+    if (!user) {
+        return next(new AppError('Invalid Or Expired Token', 400))
+    }
+    user.password = req.body.password
+    user.passwordConfirm = req.body.passwordConfirm
+    user.PasswordResetToken = undefined
+    user.passwordResetExpires = undefined
+    await user.save()
+
+
+
+    // 3- log he user in (send jwt)
+    const newToken = signToken({ id: user._id })
+    res.status(200).json({
+        status: 'success',
+        token: newToken
+    })
+
 })
 
 // export const signup = catchAsync(async (req: Request<{}, userResponce, IUser >, res: Response<userResponce>, next: NextFunction) => {

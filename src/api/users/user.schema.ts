@@ -26,6 +26,20 @@ const userIdSchema = z.object({
 }).strict();;
 
 
+const userEmaildSchema = z.object({
+    email: z
+    .string()
+    .email({ message: 'Please provide a valid email' }),
+}).strict()
+
+export type Email = z.infer<typeof userEmaildSchema>
+export const userForgetPasswordSchema = z.object({
+    body: userEmaildSchema,
+    params: z.object({})
+}).strict()
+
+
+
 export const createUserSchema = z.object({
     body: userBodySchema.refine((data) => data.password === data.passwordConfirm, {
         message: 'Passwords do not match',
@@ -78,3 +92,4 @@ export const createUserLoginSchema = z.object({
     body: loginUserSchema,
     params: z.object({})
 }).strict()
+

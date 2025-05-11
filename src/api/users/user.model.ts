@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
 import validator from "validator";
 import bcrypt from 'bcrypt'
+import crypto from 'crypto'
 export interface IUser {
     name: string;
     email: string;
@@ -11,6 +12,9 @@ export interface IUser {
     correctPassword: (pass1: string, pass2: string) => Promise<boolean>
     passwordChangedAt?: Date,
     changePasswordAfter: (tokenTime: number) => boolean
+    PasswordResetToken?: string
+    passwordResetExpires?: Date
+    createPasswordRestetToken: () => string
 }
 export interface IUserInput {
     name: string;
@@ -56,7 +60,11 @@ const userSchema = new mongoose.Schema<IUser>({
             message: 'passwords don\'t match'
         },
     },
-    passwordChangedAt: Date
+    passwordChangedAt: Date,
+
+    PasswordResetToken: String,
+
+    passwordResetExpires: Date
 })
 userSchema.pre('save', async function (next) {
     if (!this.isModified('password')) return next();
@@ -78,4 +86,18 @@ userSchema.methods.changePasswordAfter = function (JWTTimestamp: number) {
     }
     return false;
 };
+
+userSchema.methods.createPasswordRestetToken = function(){
+    const resetToken = crypto.randomBytes(32).toString('hex'); 
+
+    this.PasswordResetToken = crypto.createHash('sha256').update(resetToken).digest('hex');
+
+    this.passwordResetExpires = Date.now() + 10 * 60 * 1000
+
+    return resetToken;
+
+}
+
+
+
 export const User = mongoose.model<IUser>('User', userSchema)

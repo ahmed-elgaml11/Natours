@@ -5,7 +5,7 @@ import { promisify } from "util";
 import { string, unknown } from "zod";
 
 interface payloadDate {
-  id: mongoose.Types.ObjectId
+  id: mongoose.Types.ObjectId 
 }
 export const signToken = (payload: payloadDate) => {
   const { JWT_EXPIRESIN, JWT_SECRET } = process.env;

@@ -17,3 +17,7 @@ export const findUserById = async (id: string)  => {
 export const findUserByToken = async (token: string)  => {
     return  User.findOne({PasswordResetToken: token, passwordResetExpires: { $gt: new Date(Date.now()) }})
 }
+
+export const findUserWithPassById = async (id: string)  => {
+    return await User.findById(id).select('+password')
+}

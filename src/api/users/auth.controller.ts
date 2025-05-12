@@ -5,9 +5,10 @@ import { IUser, IUserInput } from './user.model';
 import { catchAsync } from '../../utils/catchAsync';
 import { AppError } from '../../utils/appError';
 import { signToken } from '../../utils/jwt';
-import { LoginType, Email,ResetPassword } from './user.schema';
+import { LoginType, Email, ResetPassword } from './user.schema';
 import { sendEmail } from '../../utils/email';
 import crypto from 'crypto'
+import app from '../../app';
 
 
 
@@ -126,7 +127,34 @@ export const resetPassword = catchAsync(async (req: Request<{ token: string }, u
 
 })
 
-// export const signup = catchAsync(async (req: Request<{}, userResponce, IUser >, res: Response<userResponce>, next: NextFunction) => {
-// })
+export const updateMyPassword = catchAsync(async (req: Request, res: Response<userResponce>, next: NextFunction) => {
+    // 1-  get the user
+    const user = await Services.findUserWithPassById(req.user!._id.toString());
+    if (!user) {
+        throw new AppError('user not found', 404)
+    }
+
+    // 2- check if the password is correct 
+    const isMatch = await user.correctPassword(req.body.currentPassword, user.password)
+    if (!isMatch)
+        return next(new AppError('Incorrect current password', 401));
+
+    // 3- if correct , update the password 
+    user.password = req.body.password
+    user.passwordConfirm = req.body.passwordConfirm
+
+    await user.save()
+
+
+    // 4- log the user in (send jwt)
+    const token: string = signToken({ id: user._id })
+    res.status(200).json({
+        status: 'success',
+        token,
+        data: {
+            user
+        }
+    })
+})
 // export const signup = catchAsync(async (req: Request<{}, userResponce, IUser >, res: Response<userResponce>, next: NextFunction) => {
 // })

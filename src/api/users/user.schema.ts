@@ -28,8 +28,8 @@ const userIdSchema = z.object({
 
 const userEmaildSchema = z.object({
     email: z
-    .string()
-    .email({ message: 'Please provide a valid email' }),
+        .string()
+        .email({ message: 'Please provide a valid email' }),
 }).strict()
 
 export type Email = z.infer<typeof userEmaildSchema>
@@ -96,25 +96,41 @@ export const createUserLoginSchema = z.object({
 
 
 const resetPasswordSchema = z.object({
-    password:  z
+    password: z
         .string()
         .min(8, { message: 'Password must be at least 8 characters long' }),
     passwordConfirm: z.string().min(8, { message: 'Please confirm your password' }),
 })
 export type ResetPassword = z.infer<typeof resetPasswordSchema>
 const tokenQuerySchema = z.object({
-  token: z
-    .string()
-    .regex(/^[a-f0-9]{64}$/, 'Invalid token format'),
+    token: z
+        .string()
+        .regex(/^[a-f0-9]{64}$/, 'Invalid token format'),
 });
 
 export const createResetPasswordSchema = z.object({
     body: resetPasswordSchema.refine(
-    (data) => data.password === data.passwordConfirm,
-    {
-      message: 'Passwords do not match',
-      path: ['passwordConfirm'], 
-    }
-  ),
+        (data) => data.password === data.passwordConfirm,
+        {
+            message: 'Passwords do not match',
+            path: ['passwordConfirm'],
+        }
+    ),
     params: tokenQuerySchema
+})
+
+const updatePasswordSchema = z.object({
+    currentPassword: z.string()
+        .min(8, { message: 'Password must be at least 8 characters long' }),
+    password: z.string()
+        .min(8, { message: 'Password must be at least 8 characters long' }),
+    passwordConfirm: z.string()
+        .min(8, { message: 'Password must be at least 8 characters long' })
+})
+export const createUpdatePasswordSchema = z.object({
+    body: updatePasswordSchema.refine((data) => data.password === data.passwordConfirm, {
+         message: 'Passwords do not match',
+      path: ['passwordConfirm'], 
+    }),
+    params: z.object({})
 })

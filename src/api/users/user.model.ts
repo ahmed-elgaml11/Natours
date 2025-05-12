@@ -1,8 +1,9 @@
-import mongoose from "mongoose";
+import mongoose, { Document, Types } from "mongoose";
 import validator from "validator";
 import bcrypt from 'bcrypt'
 import crypto from 'crypto'
-export interface IUser  {
+export interface IUser extends Document  {
+    _id: string | Types.ObjectId
     name: string;
     email: string;
     photo?: string;
@@ -52,7 +53,7 @@ const userSchema = new mongoose.Schema<IUser>({
     },
     passwordConfirm: {
         type: String,
-        required: [true, 'Please confirm your password'],
+        required: [true, 'Please confirm your password.'],
         validate: {
             validator: function (ele) {
                 return ele === this.password;

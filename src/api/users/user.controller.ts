@@ -21,3 +21,13 @@ export const updateMe = catchAsync(async (req: Request<{}, userResponce, UpdateM
         }
     })
 })
+
+
+export const deleteMe = catchAsync(async(req: Request,  res: Response<userResponce>, next: NextFunction) => {
+
+    await Services.inActiveUser(req.user!._id as string)
+
+    res.status(204).json({
+        status: 'success',
+    })
+})

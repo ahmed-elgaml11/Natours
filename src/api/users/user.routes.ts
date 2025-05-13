@@ -16,7 +16,7 @@ router.patch('/updateMyPassword', validateRequest(createUpdatePasswordSchema), p
 
 
 router.patch('/updateMe', validateRequest(updateMeSchema), protect, userController.updateMe)
-
+router.delete('/deleteMe', protect, userController.deleteMe)
 
 
 

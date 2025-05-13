@@ -40,3 +40,6 @@ export const updateData = async<T>(id: string, data: Partial<T>) => {
 };
 
 
+export const inActiveUser = async (id: string) => {
+    await User.findByIdAndUpdate({_id: id}, {isActive: false})
+}

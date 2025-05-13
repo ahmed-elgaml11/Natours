@@ -1,4 +1,4 @@
-import mongoose, { Document, Types } from "mongoose";
+import mongoose, { Document, Query, Types } from "mongoose";
 import validator from "validator";
 import bcrypt from 'bcrypt'
 import crypto from 'crypto'
@@ -16,6 +16,7 @@ export interface IUser extends Document  {
     PasswordResetToken?: string
     passwordResetExpires?: Date
     createPasswordRestetToken: () => string
+    isActive?: boolean
 }
 export interface IUserInput {
     name: string;
@@ -65,7 +66,13 @@ const userSchema = new mongoose.Schema<IUser>({
 
     PasswordResetToken: String,
 
-    passwordResetExpires: Date
+    passwordResetExpires: Date,
+
+    isActive: {
+        type: Boolean,
+        default: true,
+        select: false
+    }
 })
 userSchema.pre('save', async function (next) {
     if (!this.isModified('password')) return next();
@@ -82,6 +89,12 @@ userSchema.pre('save', function (next){
     next()
 
 })
+
+userSchema.pre(/^find/, function(this: Query<any, any>, next) {
+    this.find({ isActive: { $ne: false } })
+    next()
+})
+
 
 // instance method
 userSchema.methods.correctPassword = async (userPassword: string, hashedPassword: string) => {

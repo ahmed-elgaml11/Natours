@@ -129,8 +129,25 @@ const updatePasswordSchema = z.object({
 })
 export const createUpdatePasswordSchema = z.object({
     body: updatePasswordSchema.refine((data) => data.password === data.passwordConfirm, {
-         message: 'Passwords do not match',
-      path: ['passwordConfirm'], 
+        message: 'Passwords do not match',
+        path: ['passwordConfirm'],
     }),
     params: z.object({})
 })
+
+// const updateMedSchema = z.object({
+//     email: 
+
+// })
+// export const = createUpdateMedSchema = z
+
+export const updateMeSchema = z.object({
+    body: userBodySchema.partial().refine((data) => Object.keys(data).length > 0, {
+        message: 'At least one field is required for update'
+    }),
+    params: z.object({})
+})
+
+
+export type UpdateMeBody = z.infer<typeof updateMeSchema.shape.body>
+

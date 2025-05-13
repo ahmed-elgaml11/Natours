@@ -8,7 +8,6 @@ import { signToken } from '../../utils/jwt';
 import { LoginType, Email, ResetPassword } from './user.schema';
 import { sendEmail } from '../../utils/email';
 import crypto from 'crypto'
-import app from '../../app';
 
 
 

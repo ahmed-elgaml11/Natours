@@ -9,26 +9,42 @@ import errorHandler from './middlewares/errorHandler';
 import { rateLimit } from 'express-rate-limit'
 import helmet from 'helmet'
 import morgan from 'morgan'
+import mongoSantize from 'express-mongo-sanitize'
+import hpp from 'hpp'
 
 
 const app = express();
+// set security headers
 app.use(helmet());
+// limit body payload to prevent 'denial of service attack'
 app.use(express.json({ limit: '20kb' }));
-if (process.env.NODE_ENV === 'development')   app.use(morgan('dev'))
+// limit the number of request for the same id per windwo
 const limiter = rateLimit({
     windowMs: 15 * 60 * 1000,
     limit: 100, // Limit each IP to 100 requests per `window` (here, per 15 minutes).
     message: 'too many requests from this IP, try again in 15 minutes'
 })
 app.use('/api', limiter)
+// data sanitization against query injection
+app.use(mongoSantize())
+// request logger 
+if (process.env.NODE_ENV === 'development') app.use(morgan('dev'))
 
-
+// prevent parameter pollution
+app.use(hpp({
+    whitelist: [
+        'price',
+        'difficulty',
+        'duration',
+        'maxGroupSize'
+    ]
+}))
 
 
 
 app.get<{}, firstResponse>('/', (req, res) => {
     res.status(200).json({
-        message: 'hello from the root'
+        message: 'Hello from the root'
     })
 })
 

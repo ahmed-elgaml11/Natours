@@ -1,4 +1,7 @@
-import { IUserInput, User } from "./user.model"
+import { Request, Response, NextFunction } from 'express';
+import { IUser, IUserInput, User } from "./user.model"
+import { signToken } from '../../utils/jwt';
+import { AppError } from '../../utils/appError';
 
 export const createUser = async (body: IUserInput) => {
     return await User.create(body)
@@ -24,15 +27,15 @@ export const allowedObj = <T>(body: T, fields: (keyof T)[]) => {
     //     if (fields.includes(ele as keyof T))
     //         allowed[ele as keyof T ] = body[ele as keyof T]
     // });
-    for (const field of fields){
-        if (body[field] !== undefined){
+    for (const field of fields) {
+        if (body[field] !== undefined) {
             allowed[field] = body[field]
         }
     }
     return allowed
 }
 export const updateData = async<T>(id: string, data: Partial<T>) => {
-    const user = await  User.findOneAndUpdate({ _id: id }, data, {
+    const user = await User.findOneAndUpdate({ _id: id }, data, {
         new: true,
         runValidators: true,
     });
@@ -41,5 +44,33 @@ export const updateData = async<T>(id: string, data: Partial<T>) => {
 
 
 export const inActiveUser = async (id: string) => {
-    await User.findByIdAndUpdate({_id: id}, {isActive: false})
+    await User.findByIdAndUpdate(id , { isActive: false })
+}
+
+
+export const createSendToken = (user: IUser, res: Response, status: number) => {
+    const token = signToken({ id: user._id })
+    const cookieExpiresIn = process.env.COOKIE_EXPIRESIN
+    if (!cookieExpiresIn) throw new AppError('missing env vars: COOKIE_EXPIRESIN ', 400)
+
+    const cookieOptions = {
+        expires: new Date(
+            Date.now() + (Number(cookieExpiresIn) * 24 * 60 * 60 * 1000)
+        ),
+        httpOnly: true,
+        secure: false
+    }
+    if (process.env.NODE_ENV === 'production') cookieOptions.secure = true
+
+
+    user.password = undefined as unknown as string
+    res.cookie('jwt', token, cookieOptions)
+    res.status(status).json({
+        status: 'success',
+        token: token,
+        data: {
+            user
+        }
+    })
+
 }

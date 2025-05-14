@@ -23,17 +23,7 @@ export const signup = catchAsync(async (req: Request<{}, userResponce, IUserInpu
         passwordConfirm: req.body.passwordConfirm,
         passwordChangedAt: req.body.passwordChangedAt
     })
-    const token: string = signToken({ id: user._id })
-
-    user.password = undefined as unknown as string
-    res.status(201).json({
-        status: 'success',
-        token,
-        data: {
-            user
-        }
-
-    })
+    Services.createSendToken(user, res, 201)
 
 })
 
@@ -45,12 +35,7 @@ export const login = catchAsync(async (req: Request<{}, userResponce, LoginType>
     if (!user || !(await user.correctPassword(password, user.password))) {
         throw new AppError('Incorrect email or password', 401)
     }
-    const token: string = signToken({ id: user._id })
-    res.status(200).json({
-        status: 'success',
-        token
-    })
-
+    Services.createSendToken(user, res, 200)
 })
 
 
@@ -118,11 +103,7 @@ export const resetPassword = catchAsync(async (req: Request<{ token: string }, u
 
 
     // 3- log he user in (send jwt)
-    const newToken = signToken({ id: user._id })
-    res.status(200).json({
-        status: 'success',
-        token: newToken
-    })
+    Services.createSendToken(user, res, 200)
 
 })
 
@@ -143,17 +124,8 @@ export const updateMyPassword = catchAsync(async (req: Request, res: Response<us
     user.passwordConfirm = req.body.passwordConfirm
 
     await user.save()
-
-
     // 4- log the user in (send jwt)
-    const token: string = signToken({ id: user._id })
-    res.status(200).json({
-        status: 'success',
-        token,
-        data: {
-            user
-        }
-    })
+    Services.createSendToken(user, res, 200)
 })
 // export const signup = catchAsync(async (req: Request<{}, userResponce, IUser >, res: Response<userResponce>, next: NextFunction) => {
 // })

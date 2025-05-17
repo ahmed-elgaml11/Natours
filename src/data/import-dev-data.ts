@@ -23,7 +23,7 @@ main()
     console.log(err);
 })
 
-const tours = JSON.parse(fs.readFileSync(`${__dirname}/tours-data.json`, 'utf-8'));
+const tours = JSON.parse(fs.readFileSync(`${__dirname}/tours.json`, 'utf-8'));
 
 const addData = async () => {
     try{
@@ -46,6 +46,8 @@ try {
 }
 process.exit();
 };
+
+console.log(process.argv)
 
 if (process.argv[2] === '--import') {
     addData();

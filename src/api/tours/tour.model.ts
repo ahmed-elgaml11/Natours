@@ -2,6 +2,14 @@ import mongoose from "mongoose";
 import { Query } from "mongoose";
 import slugify from "slugify";
 
+
+type Location = {
+    type: 'Point';
+    coordinates: number[];
+    address: string;
+    description: string;
+    day?: string;
+}
 export interface ITour {
     name: string;
     slug?: string;
@@ -19,6 +27,9 @@ export interface ITour {
     createdAt: Date;
     startDates?: Date[];
     secretTour: boolean;
+    startLocation: Location,
+    locations: Location[]
+
 }
 const tourSchema = new mongoose.Schema<ITour>({
     name: {
@@ -63,7 +74,7 @@ const tourSchema = new mongoose.Schema<ITour>({
     priceDiscount: {
         type: Number,
         validate: {
-            validator: function(val){
+            validator: function (val) {
                 return val < this.price
             },
             message: 'Discount price should be lower than regular price'
@@ -92,7 +103,32 @@ const tourSchema = new mongoose.Schema<ITour>({
     secretTour: {
         type: Boolean,
         default: false
-    }
+    },
+    // Geospatial Data >>> GeoJSON
+    startLocation: {
+        type: {
+            type: String,
+            default: 'Point',
+            enum: ['Point']
+        },
+        cooridianres: [Number],
+        address: String,
+        description: String
+    },
+    locations: [
+        {
+            type: {
+                type: String,
+                default: 'Point',
+                enum: ['Point']
+            },
+            coordinates: [Number],
+            address: String,
+            description: String,
+            day: String
+        }
+    ]
+
 }, {
     toJSON: { virtuals: true },
     toObject: { virtuals: true }

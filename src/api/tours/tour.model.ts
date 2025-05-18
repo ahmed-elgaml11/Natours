@@ -28,8 +28,8 @@ export interface ITour {
     startDates?: Date[];
     secretTour: boolean;
     startLocation: Location,
-    locations: Location[]
-
+    locations: Location[],
+    guides: mongoose.Types.ObjectId[]
 }
 const tourSchema = new mongoose.Schema<ITour>({
     name: {
@@ -111,7 +111,7 @@ const tourSchema = new mongoose.Schema<ITour>({
             default: 'Point',
             enum: ['Point']
         },
-        cooridianres: [Number],
+        coordinates: [Number],
         address: String,
         description: String
     },
@@ -126,6 +126,12 @@ const tourSchema = new mongoose.Schema<ITour>({
             address: String,
             description: String,
             day: String
+        }
+    ],
+    guides: [
+        {
+            type: mongoose.Schema.ObjectId,
+            ref: 'User'
         }
     ]
 
@@ -143,6 +149,7 @@ tourSchema.pre('save', function (next) {
     next()
 })
 
+
 //query middleware
 tourSchema.pre(/^find/, function (this: Query<any, any>, next) {
     this.find({ secretTour: { $ne: true } });
@@ -156,6 +163,14 @@ tourSchema.post(/^find/, function (this: Query<any, any>, docs, next) {
     }
     next();
 })
+tourSchema.pre(/^find/, function (this: Query<any, any>, next) {
+    this.populate({
+        path: 'guides',
+        select: '-__v -passwordChangedAt'
+    })
+    next()
+})
+
 
 // aggregate middleware
 

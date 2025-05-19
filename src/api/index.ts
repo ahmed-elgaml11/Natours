@@ -2,6 +2,7 @@ import express from "express";
 import firstResponse from "../types/firstResponse";
 import tourRoutes from './tours/tour.routes'
 import userRoutes from './users/user.routes'
+import reviewRoutes from './reviews/review.routes'
 const router = express.Router();
 
 router.get<{}, firstResponse>('/', (req, res) => {
@@ -12,4 +13,5 @@ router.get<{}, firstResponse>('/', (req, res) => {
 
 router.use('/tours', tourRoutes)
 router.use('/users', userRoutes)
+router.use('/reviews', reviewRoutes)
 export default router

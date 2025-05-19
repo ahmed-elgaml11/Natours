@@ -24,7 +24,7 @@ router.delete('/deleteMe', protect, userController.deleteMe)
 
 // router
 //     .route('/')
-//     .get(userController.getUsere)
+//     .get(userController.getAllUsers)
 //     .post(validateRequest(createUserSchema), userController.addUser)
 
 // router

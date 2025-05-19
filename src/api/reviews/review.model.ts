@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+import mongoose, { Query } from "mongoose";
 const schema = mongoose.Schema
 export interface IReview extends Document {
     review: string;
@@ -33,4 +33,15 @@ const reiewSchema = new schema<IReview>({
     }
 })
 
+
+reiewSchema.pre(/^find/, function(this: Query<any, any>, next) {
+    this.populate({
+        path: 'tour' ,
+        select: 'name summary'
+    }).populate({
+        path: 'user' ,
+        select: 'name'
+    });
+    next()
+})
 export const Review = mongoose.model<IReview>('Review', reiewSchema)

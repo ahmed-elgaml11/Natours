@@ -15,7 +15,9 @@ export const getAllReviews = catchAsync(async(req: Request, res: Response<review
         }
     })
 })
-export const addReview = catchAsync(async(req: Request<{}, reviewResponse, IReview>, res: Response<reviewResponse>, next: NextFunction) => {
+export const addReview = catchAsync(async(req: Request<{tourId: string}, reviewResponse, IReview>, res: Response<reviewResponse>, next: NextFunction) => {
+    if(!req.body.tour)  req.body.tour = req.params.tourId
+    if(!req.body.user)  req.body.user = req.user!.id
     const review = await Services.addReview(req.body)
 
     res.status(200).json({

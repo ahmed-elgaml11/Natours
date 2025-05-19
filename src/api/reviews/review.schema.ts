@@ -8,8 +8,8 @@ const objectIdString = z.string().refine(val => Types.ObjectId.isValid(val), {
 export const reviewBodySchema = z.object({
   review: z.string().min(1, 'Review cannot be empty'),
   rating: z.number().min(1, 'Rating must be at least 1').max(5, 'Rating cannot exceed 5'),
-  tour: objectIdString,
-  user: objectIdString,
+  tour: objectIdString.optional(),
+  user: objectIdString.optional(),
 }).strict();
 
 export const createReviewBodySchema = z.object({

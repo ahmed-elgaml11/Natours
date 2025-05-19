@@ -5,7 +5,8 @@ import { validateRequest } from '../../middlewares/validateRequest'
 import { tourSchema } from "./tour.schema";
 import { topTours } from "../../middlewares/tours/topTouts";
 import { protect, restrictTo } from '../../middlewares/protectRoutes'
-
+import { createReviewBodySchema } from '../reviews/review.schema'
+import * as reviewControllers from '../reviews/review.controller'
 router.get('/top-5-tours', topTours, tourControllers.getAllTours)   //limit=5&sort=-ratingAverages,price
 router.get('/tour-stats', tourControllers.tourStats )                    //aggredation pipeline
 router.get('/monthly-plan/:year', tourControllers.monthlyPlan)
@@ -21,5 +22,12 @@ router
     .patch(validateRequest(tourSchema, ['params', 'halfBody']), tourControllers.updateTour)
     .delete(validateRequest(tourSchema, ['params']), protect, restrictTo(['admin', 'lead-guide']), tourControllers.deleteTour)
 
+
+
+
+router
+    .route('/:tourId/reviews')
+    .post(validateRequest(createReviewBodySchema), protect, restrictTo(['user']), reviewControllers.addReview )
+    .get()    
 
 export default router

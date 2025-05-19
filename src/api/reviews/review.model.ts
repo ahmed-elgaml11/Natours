@@ -4,8 +4,8 @@ export interface IReview extends Document {
     review: string;
     rating: number;
     createdAt: Date;
-    tour: mongoose.Types.ObjectId;
-    user: mongoose.Types.ObjectId;
+    tour: mongoose.Types.ObjectId | string;
+    user: mongoose.Types.ObjectId | string;
 }
 const reiewSchema = new schema<IReview>({
     review: {

@@ -1,5 +1,5 @@
 import  express  from "express";
-const router = express.Router();
+const router = express.Router({mergeParams: true});
 import * as reviewController from './review.controller'
 import { protect, restrictTo } from "../../middlewares/protectRoutes";
 import {validateRequest} from '../../middlewares/validateRequest'

@@ -29,7 +29,7 @@ export interface ITour {
     secretTour: boolean;
     startLocation: Location,
     locations: Location[],
-    guides: mongoose.Types.ObjectId[]
+    guides?: mongoose.Types.ObjectId[]
 }
 const tourSchema = new mongoose.Schema<ITour>({
     name: {

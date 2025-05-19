@@ -5,7 +5,9 @@ import { reviewResponse } from '../../types/reviewResponse';
 import { IReview } from './review.model';
 
 export const getAllReviews = catchAsync(async(req: Request, res: Response<reviewResponse>, next: NextFunction) => {
-    const reviews = await Services.getAllReviews()
+    let filter = {}
+    if(req.params.tourId)  filter = { tour: req.params.tourId }
+    const reviews = await Services.getAllReviews(filter)
 
     res.status(200).json({
         status: 'success',

@@ -1,7 +1,7 @@
 import { IReview, Review } from "./review.model"
 
-export const getAllReviews = async () => {
-    return Review.find();
+export const getAllReviews = async (filter: object) => {
+    return Review.find(filter);
 }
 
 export const addReview = async (body: IReview) => {

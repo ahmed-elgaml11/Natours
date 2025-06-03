@@ -16,7 +16,7 @@ export const signup = catchAsync(async (req: Request<{}, userResponce, IUserInpu
     if (existUser) {
         throw new AppError('this email is already exists, choose another one.', 400)
     }
-    const user = await Services.createUser({
+    const user = await Services.createOne({
         name: req.body.name,
         email: req.body.email,
         password: req.body.password,

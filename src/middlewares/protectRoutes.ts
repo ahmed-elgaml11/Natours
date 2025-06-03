@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import { catchAsync } from '../utils/catchAsync';
 import { AppError } from '../utils/appError';
 import { verifyToken } from '../utils/jwt';
-import { findUserById } from '../api/users/user.services';
+import { getOneById } from '../api/users/user.services';
 export const protect = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
     // 1- check if there is a token and get it
     let token;
@@ -18,7 +18,7 @@ export const protect = catchAsync(async (req: Request, res: Response, next: Next
 
 
     // 3- check if the user still exists (if a customer blocked or fired or removed from the db)
-    const user = await findUserById(decoded.id)
+    const user = await getOneById(decoded.id)
     if (!user) {
         return next(new AppError('the user beloginig to this token is not exists', 401))
     }

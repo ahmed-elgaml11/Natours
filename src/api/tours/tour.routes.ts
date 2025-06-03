@@ -6,23 +6,26 @@ import { tourSchema } from "./tour.schema";
 import { topTours } from "../../middlewares/tours/topTouts";
 import { protect, restrictTo } from '../../middlewares/protectRoutes'
 import reviewRoutes from '../reviews/review.routes'
+import { uniqueTourName } from "../../middlewares/tours/uniqueName";
 
-
-
-router.get('/top-5-tours', topTours, tourControllers.getAllTours)   //limit=5&sort=-ratingAverages,price
-router.get('/tour-stats', tourControllers.tourStats )                    //aggredation pipeline
-router.get('/monthly-plan/:year', tourControllers.monthlyPlan)
 
 router
     .route('/')
     .get(protect, tourControllers.getAllTours)
-    .post(validateRequest(tourSchema, ['body']), tourControllers.addTour)
+    .post( protect, restrictTo(['admin']), validateRequest(tourSchema, ['body']), uniqueTourName, tourControllers.addTour)
 
-router 
+router
     .route('/:id')
-    .get(validateRequest(tourSchema, ['params']), tourControllers.getTour)
-    .patch(validateRequest(tourSchema, ['params', 'halfBody']), tourControllers.updateTour)
-    .delete(validateRequest(tourSchema, ['params']), protect, restrictTo(['admin', 'lead-guide']), tourControllers.deleteTour)
+    .get(protect, validateRequest(tourSchema, ['params']), tourControllers.getTour)
+    .patch(protect, validateRequest(tourSchema, ['params', 'halfBody']), restrictTo(['admin']), tourControllers.updateTour)
+    .delete(protect, validateRequest(tourSchema, ['params']),  restrictTo(['admin', 'lead-guide']), tourControllers.deleteTour)
+
+
+
+router.get('/top-5-tours', topTours, tourControllers.getAllTours)   //limit=5&sort=-ratingAverages,price
+router.get('/tour-stats', tourControllers.tourStats)                    //aggredation pipeline
+router.get('/monthly-plan/:year', tourControllers.monthlyPlan)
+
 
 
 router.use('/:tourId/reviews', reviewRoutes)

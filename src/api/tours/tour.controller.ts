@@ -1,94 +1,24 @@
 import { Request, Response, NextFunction, json } from 'express';
 import { catchAsync } from '../../utils/catchAsync';
 import { toursResponse } from '../../types/toursResponse';
-import * as Servises from './tour.services'
-import { AppError } from '../../utils/appError';
-import { ITour, Tour } from './tour.model'
-import { updatedTourType } from './tour.schema'
-import { APIFeatures } from '../../utils/queryFeatures';
-import { number } from 'zod';
-
-export const getAllTours = catchAsync(async (req: Request, res: Response<toursResponse>, next: NextFunction) => {
-    const features =  new APIFeatures(Tour.find(), req.query)
-        .filter()
-        .sort()
-        .limitFields()
-        .paginate()
-
-    const tours = await features.query
+import * as tourServices from './tour.services'
+import * as factory from '../../utils/handlerFactory'
 
 
-    res.status(200).json({
-        status: 'success',
-        results: tours.length,
-        data: {
-            tours: tours
-        }
-    })
-})
-export const addTour = catchAsync(async (req: Request<{}, toursResponse, ITour>, res: Response<toursResponse>, next: NextFunction) => {
-    const { name } = req.body
-    const existingTour = await Servises.getTour(name);
-    if (existingTour) {
-        throw new AppError('unavailable Tour name, choose another one!.', 400)
-    }
-    const newTour = await Servises.addTour(req.body);
-    res.status(201).json({
-        status: 'success',
-        data: {
-            tour: newTour
-        }
-    })
-})
-export const getTour = catchAsync(async (req: Request<{ id: string }, toursResponse, {}>, res: Response<toursResponse>, next: NextFunction) => {
-    const { id } = req.params
-    const tour = await Servises.getTourbyId(id);
-    if (!tour) {
-        throw new AppError('No tour found with that ID', 404);
-    }
 
-    res.status(200).json({
-        status: 'success',
-        data: {
-            tour
-        }
-    })
+export const getAllTours = factory.getAll('tour')
 
+export const addTour = factory.createOne('tour')
 
-})
-export const updateTour = catchAsync(async (req: Request<{ id: string }, toursResponse, updatedTourType>, res: Response<toursResponse>, next: NextFunction) => {
-    const { id } = req.params
-    const updateTour = await Servises.updateTour(id, req.body);
-    if (!updateTour) {
-        throw new AppError('No tour found with that ID', 404);
-    }
-    res.status(200).json({
-        status: 'success',
-        data: {
-            tour: updateTour
-        }
-    })
+export const getTour = factory.getOne('tour')
 
+export const updateTour = factory.updateOne('tour')
 
-})
-export const deleteTour = catchAsync(async (req: Request, res: Response<toursResponse>, next: NextFunction) => {
-    const { id } = req.params
-    const deletedTour = await Servises.deletedTour(id);
-    if (!deletedTour) {
-        throw new AppError('No tour found with that ID', 404);
-    }
+export const deleteTour = factory.deleteOne('tour')
 
-    res.status(204).json({
-        status: 'success',
-        data: {
-
-        }
-    });
-
-})
 
 export const tourStats = catchAsync(async (req: Request, res: Response<toursResponse>, next: NextFunction) => {
-    const stats = await Servises.tourStats();
+    const stats = await tourServices.tourStats();
     res.status(200).json({
         status: 'success',
         data: {
@@ -100,7 +30,7 @@ export const tourStats = catchAsync(async (req: Request, res: Response<toursResp
 
 export const monthlyPlan = catchAsync(async (req: Request, res: Response<toursResponse>, next: NextFunction) => {
     const year = Number(req.params.year);
-    const plan = await Servises.monthlyPlan(year)
+    const plan = await tourServices.monthlyPlan(year)
 
     res.status(200).json({
         status: 'success',

@@ -1,12 +1,12 @@
-import { object, z } from 'zod';
+import { z } from 'zod';
 
 export const tourSchema = {
     body: z.object({
         name: z
-        .string({ required_error: 'A tour must have a name' })
-        .trim()
-        .min(10, 'A tour name must have more or equal then 10 characters')
-        .max(40, 'A tour name must have less or equal then 40 characters'),
+            .string({ required_error: 'A tour must have a name' })
+            .trim()
+            .min(10, 'A tour name must have more or equal then 10 characters')
+            .max(40, 'A tour name must have less or equal then 40 characters'),
         slug: z.string().optional(),
         duration: z
             .number({ required_error: 'A tour must have a duration' })
@@ -26,7 +26,10 @@ export const tourSchema = {
         price: z
             .number({ required_error: 'A tour must have a price' })
             .positive('Price must be a positive number'),
-        priceDiscount: z.number().positive('Price discount must be a positive number').optional(),
+        priceDiscount: z
+            .number()
+            .positive('Price discount must be a positive number')
+            .optional(),
         summary: z
             .string({ required_error: 'A tour must have a summary' })
             .trim()
@@ -36,18 +39,39 @@ export const tourSchema = {
         images: z.array(z.string()).optional(),
         startDates: z.array(z.coerce.date()).optional(),
         secretTour: z.boolean().default(false),
-    }),
+        startLocation: z.object({
+            type: z.literal('Point', { message: 'Type must be Point' }),
+            coordinates: z.array(z.number()).length(2, 'Coordinates must contain exactly 2 numbers (longitude, latitude)'),
+            address: z.string().optional(),
+            description: z.string().optional(),
+        }).optional(),
+        locations: z
+            .array(
+                z.object({
+                    type: z.literal('Point', { errorMap: () => ({ message: 'Type must be Point' }) }),
+                    coordinates: z.array(z.number()).length(2, 'Coordinates must contain exactly 2 numbers (longitude, latitude)'),
+                    address: z.string().optional(),
+                    description: z.string().optional(),
+                    day: z.string().optional(),
+                })
+            )
+            .optional(),
+        guides: z
+            .array(z.string().regex(/^[0-9a-fA-F]{24}$/, 'Invalid User ID format'))
+            .optional(),
+    }).strict(),
+
     params: z.object({
         id: z.string().regex(/^[0-9a-fA-F]{24}$/, 'Invalid tour ID format')
-    })
+    }).strict()
 }
 
 
 
-export const updateTourSchema = tourSchema.body.partial().refine((data) => Object.keys(data).length > 0 , {
-        message: 'At least one field is required for update'
+export const updateTourSchema = tourSchema.body.partial().refine((data) => Object.keys(data).length > 0, {
+    message: 'At least one field is required for update'
 })
 
 
-export type updatedTourType = z.infer<typeof updateTourSchema>
+export type UpdatedTourType = z.infer<typeof updateTourSchema>
 

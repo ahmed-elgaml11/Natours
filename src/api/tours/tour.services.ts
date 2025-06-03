@@ -1,26 +1,25 @@
-import mongoose from "mongoose"
 import { Tour } from "./tour.model"
 import { ITour } from "./tour.model"
-import { updatedTourType } from './tour.schema'
+import { UpdatedTourType } from './tour.schema'
 
-export const getAllTours = async () => {
-    return Tour.find()
+export const getAll =  (filter: object) => {
+    return Tour.find(filter)
 }
-export const addTour = async (body: ITour) => {
+export const createOne = async (body: ITour) => {
     return Tour.create(body)
 }
 export const getTour = async (name: string) => {
     return Tour.findOne({name})
 }
-export const getTourbyId = async (id: string) => {
+export const getOneById = async (id: string) => {
     return Tour.findById(id).populate('reviews')
 }
-export const updateTour = async (id: string, body: updatedTourType ) => {
+export const updateOne = async (id: string, body: Partial<ITour> ) => {
     return await Tour.findByIdAndUpdate(id, body, {
         new: true,
     })
 }
-export const deletedTour = async (id: string ) => {
+export const deleteOne = async (id: string ) => {
     return await Tour.findByIdAndDelete(id)
 }
 

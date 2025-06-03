@@ -3,16 +3,32 @@ import { IUser, IUserInput, User } from "./user.model"
 import { signToken } from '../../utils/jwt';
 import { AppError } from '../../utils/appError';
 
-export const createUser = async (body: IUserInput) => {
+export const getAll = (filter: object) => {
+    return  User.find(filter);
+}
+
+export const createOne = async (body: IUserInput) => {
     return await User.create(body)
 }
+
 export const findUser = async (email: string) => {
     return await User.findOne({ email }).select('+password')
 }
 
-export const findUserById = async (id: string) => {
+export const getOneById = async (id: string) => {
     return await User.findById(id)
 }
+
+export const deleteOne = async (id: string ) => {
+    return await User.findByIdAndDelete(id)
+}
+
+export const updateOne = async (id: string, body: Partial<IUser> ) => {
+    return await User.findByIdAndUpdate(id, body, {
+        new: true,
+    })
+}
+
 
 export const findUserByToken = async (token: string) => {
     return User.findOne({ PasswordResetToken: token, passwordResetExpires: { $gt: new Date(Date.now()) } })

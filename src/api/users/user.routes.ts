@@ -4,10 +4,14 @@ import * as userController from './user.controller'
 import { validateRequest } from "../../middlewares/validateRequest";
 import {  updateMeSchema, getUserSchema, updateUserSchema,} from "./user.schema";
 import { protect, restrictTo } from "../../middlewares/protectRoutes";
+import { getMe } from "../../middlewares/users/getMe";
 
 
 
 
+router.patch('/updateMe', validateRequest(updateMeSchema), protect, userController.updateMe)
+router.delete('/deleteMe', protect, userController.deleteMe)
+router.get('/me', protect, getMe, userController.getUser)
 
 
 router
@@ -20,8 +24,5 @@ router
         .patch(protect, restrictTo(['admin', 'user']), validateRequest(updateUserSchema), userController.updateUser)    
         .delete(protect, restrictTo(['admin']), validateRequest(getUserSchema), userController.deleteUser)    
 
-
-router.patch('/updateMe', validateRequest(updateMeSchema), protect, userController.updateMe)
-router.delete('/deleteMe', protect, userController.deleteMe)
 
 export default router

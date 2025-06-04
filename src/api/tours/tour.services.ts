@@ -74,7 +74,7 @@ export const monthlyPlan = async (year: number) => {
             $project: { _id: 0 }
         },
         {
-            $sort: { numTours: -1 }
+            $sort: { month: 1 }
         },
         {
             $limit:  12 

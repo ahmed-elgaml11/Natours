@@ -9,9 +9,9 @@ import { protect } from "../../middlewares/protectRoutes";
 
 router.post('/signup', validateRequest(createUserSchema), authController.signup)
 router.post('/login', validateRequest(createUserLoginSchema), authController.login)
-
 router.post('/forgetPassword', validateRequest(userForgetPasswordSchema), authController.forgetPassword)
-router.patch('/resetPassword/:token', validateRequest(createResetPasswordSchema), protect, authController.resetPassword)
+router.patch('/resetPassword/:token', validateRequest(createResetPasswordSchema), authController.resetPassword)
+
 router.patch('/updateMyPassword', validateRequest(createUpdatePasswordSchema), protect, authController.updateMyPassword)
 
 export default router

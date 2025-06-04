@@ -6,15 +6,18 @@ import {validateRequest} from '../../middlewares/validateRequest'
 import { createReviewBodySchema, getReviewSchema, updateReviewShema } from './review.schema'
 import * as reviewControllers from './review.controller'
 import { setUserTourId } from '../../middlewares/reviews/userAndTourId'
+
+router.use(protect)
+
 router
     .route('/')
-        .get(protect, restrictTo(['admin']), reviewController.getAllReviews)
-        .post(protect, setUserTourId, validateRequest(createReviewBodySchema), restrictTo(['user']), reviewController.addReview)
+        .get(reviewController.getAllReviews)
+        .post(restrictTo(['user']), setUserTourId, validateRequest(createReviewBodySchema), reviewController.addReview)
 
 router
     .route('/:id')
-        .get(validateRequest(getReviewSchema),  protect, restrictTo(['admin']), reviewControllers.getReview)    
-        .patch(validateRequest(updateReviewShema), protect, restrictTo(['user']), reviewControllers.updateReview)    
-        .delete(validateRequest(getReviewSchema),  protect, restrictTo(['user', 'admin']), reviewControllers.deleteReview)    
+        .get(validateRequest(getReviewSchema), reviewControllers.getReview)    
+        .patch(validateRequest(updateReviewShema), restrictTo(['user', 'admin']), reviewControllers.updateReview)    
+        .delete(validateRequest(getReviewSchema), restrictTo(['user', 'admin']), reviewControllers.deleteReview)    
 
 export default router

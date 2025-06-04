@@ -11,9 +11,9 @@ export const updateMe = catchAsync(async (req: Request<{}, userResponce, UpdateM
         return next (new AppError('use /updatePaswword ', 400))
     }
 
-    const allowedObg = service.allowedObj<UpdateMeBody>(req.body, ['email', 'name'])
+    const allowedObj = service.allowedObj<UpdateMeBody>(req.body, ['email', 'name'])
 
-    const updatedUser = await service.updateData<UpdateMeBody>(req.user!._id as string, allowedObg)
+    const updatedUser = await service.updateData<UpdateMeBody>(req.user?._id as string, allowedObj)
 
     res.status(200).json({
         status: 'success', 

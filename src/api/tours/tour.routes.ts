@@ -11,20 +11,20 @@ import { uniqueTourName } from "../../middlewares/tours/uniqueName";
 
 router
     .route('/')
-    .get(protect, tourControllers.getAllTours)
-    .post( protect, restrictTo(['admin']), validateRequest(tourSchema, ['body']), uniqueTourName, tourControllers.addTour)
+    .get(tourControllers.getAllTours)
+    .post(protect, restrictTo(['admin', 'lead-guide']), validateRequest(tourSchema, ['body']), uniqueTourName, tourControllers.addTour)
 
 router
     .route('/:id')
-    .get(protect, validateRequest(tourSchema, ['params']), tourControllers.getTour)
-    .patch(protect, validateRequest(tourSchema, ['params', 'halfBody']), restrictTo(['admin']), tourControllers.updateTour)
-    .delete(protect, validateRequest(tourSchema, ['params']),  restrictTo(['admin', 'lead-guide']), tourControllers.deleteTour)
+    .get(validateRequest(tourSchema, ['params']), tourControllers.getTour)
+    .patch(protect, restrictTo(['admin', 'lead-guide']), validateRequest(tourSchema, ['params', 'halfBody']),  tourControllers.updateTour)
+    .delete(protect,  restrictTo(['admin', 'lead-guide']), validateRequest(tourSchema, ['params']),  tourControllers.deleteTour)
 
 
 
 router.get('/top-5-tours', topTours, tourControllers.getAllTours)   //limit=5&sort=-ratingAverages,price
 router.get('/tour-stats', tourControllers.tourStats)                    //aggredation pipeline
-router.get('/monthly-plan/:year', tourControllers.monthlyPlan)
+router.get('/monthly-plan/:year', protect, restrictTo(['admin', 'lead-guide', 'guide']), tourControllers.monthlyPlan)
 
 
 

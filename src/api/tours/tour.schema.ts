@@ -52,7 +52,7 @@ export const tourSchema = {
                     coordinates: z.array(z.number()).length(2, 'Coordinates must contain exactly 2 numbers (longitude, latitude)'),
                     address: z.string().optional(),
                     description: z.string().optional(),
-                    day: z.string().optional(),
+                    day: z.string().or(z.number()).optional(),
                 })
             )
             .optional(),

@@ -41,11 +41,13 @@ const reiewSchema = new schema<IReview>({
     }
 })
 
+reiewSchema.index({ tour: 1, user: 1 }, { unique: true })
+
 
 reiewSchema.pre(/^find/, function (this: Query<any, any>, next) {
     this.populate({
         path: 'tour',
-        select: 'name summary'
+        select: 'name summary '
     }).populate({
         path: 'user',
         select: 'name'
@@ -98,13 +100,12 @@ reiewSchema.pre(/^findOneAnd/, async function (this: QueryWithDoc, next) {
 
 reiewSchema.post(/^findOneAnd/, async function (this: QueryWithDoc) {
     const doc = this.doc;
-    console.log(doc)
     if (!doc) return;
 
-    const model = doc.constructor as mongoose.Model<IReview> & {
-        calculateAvgRatings(tourId: mongoose.Types.ObjectId | string): Promise<void>;
-    };
+    const model = doc.constructor as ReviewModel
 
     await model.calculateAvgRatings(doc.tour?._id);
 });
+
+
 export const Review = mongoose.model<IReview>('Review', reiewSchema)

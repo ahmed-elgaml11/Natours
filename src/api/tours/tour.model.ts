@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
 import { Query } from "mongoose";
 import slugify from "slugify";
+import { number } from "zod";
 
 
 type Location = {
@@ -61,7 +62,8 @@ const tourSchema = new mongoose.Schema<ITour>({
         type: Number,
         default: 4,
         min: [1, 'Rating must be above 1.0'],
-        max: [5, 'Rating must be below 5.0']
+        max: [5, 'Rating must be below 5.0'],
+        set: (val: number) => Math.round(val * 10) / 10
     },
     ratingsQuantity: {
         type: Number,
@@ -140,6 +142,7 @@ const tourSchema = new mongoose.Schema<ITour>({
     toObject: { virtuals: true }
 }
 );
+
 tourSchema.index({ price: 1, ratingsAverage: -1 })
 tourSchema.index({ slug: 1})
 

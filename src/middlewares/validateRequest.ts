@@ -1,4 +1,4 @@
-import { AnyZodObject, z } from 'zod';
+import { AnyZodObject, object, z } from 'zod';
 import { Request, Response, NextFunction } from 'express';
 import { catchAsync } from '../utils/catchAsync';
 import { AppError } from '../utils/appError';
@@ -43,6 +43,9 @@ export const validateRequest = (
             }
         } else {
             const zodSchema = schema as AnyZodObject;
+            if (!Object.keys(req.body).length && req.file) {
+                return next();
+            }
             const result = zodSchema.safeParse({
                 body: req.body,
                 params: req.params,

@@ -40,7 +40,10 @@ const userSchema = new mongoose.Schema<IUser>({
         lowercase: true,
         validate: [validator.isEmail, 'Please provide a valid email']
     },
-    photo: String,
+    photo:{
+        type: String,
+        default: 'default.png'
+    },
     role: {
         type: String,
         enum: ['user', 'guide', 'lead-guide', 'admin'],
@@ -74,21 +77,21 @@ const userSchema = new mongoose.Schema<IUser>({
         select: false
     }
 })
-// userSchema.pre('save', async function (next) {
-//     if (!this.isModified('password')) return next();
-//     this.password = await bcrypt.hash(this.password, 12);
-//     this.passwordConfirm = undefined as unknown as string;
-//     next();
+userSchema.pre('save', async function (next) {
+    if (!this.isModified('password')) return next();
+    this.password = await bcrypt.hash(this.password, 12);
+    this.passwordConfirm = undefined as unknown as string;
+    next();
 
-// })
+})
 
-// userSchema.pre('save', function (next){
-//     if (!this.isModified('password') || this.isNew)  return next()
+userSchema.pre('save', function (next){
+    if (!this.isModified('password') || this.isNew)  return next()
 
-//     this.passwordChangedAt = new Date (Date.now() - 1000)
-//     next()
+    this.passwordChangedAt = new Date (Date.now() - 1000)
+    next()
 
-// })
+})
 
 userSchema.pre(/^find/, function(this: Query<any, any>, next) {
     this.find({ isActive: { $ne: false } })

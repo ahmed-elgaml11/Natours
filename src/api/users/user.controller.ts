@@ -13,6 +13,10 @@ export const updateMe = catchAsync(async (req: Request<{}, userResponce, UpdateM
 
     const allowedObj = service.allowedObj<UpdateMeBody>(req.body, ['email', 'name'])
 
+    if(req.file){
+        allowedObj.photo = req.file.filename
+    }
+
     const updatedUser = await service.updateData<UpdateMeBody>(req.user?._id as string, allowedObj)
 
     res.status(200).json({

@@ -8,6 +8,12 @@ import { protect, restrictTo } from '../../middlewares/protectRoutes'
 import reviewRoutes from '../reviews/review.routes'
 import { uniqueTourName } from "../../middlewares/tours/uniqueName";
 
+router.get('/top-5-tours', topTours, tourControllers.getAllTours)   //limit=5&sort=-ratingAverages,price
+router.get('/tour-stats', tourControllers.tourStats)                    //aggredation pipeline
+router.get('/monthly-plan/:year', protect, restrictTo(['admin', 'lead-guide', 'guide']), tourControllers.monthlyPlan)
+
+router.get('/tours-within/:distance/center/:latlng/unit/:unit', tourControllers.getToursWithin)
+router.get('/distances/:latlng/unit/:unit', tourControllers.getDistances)
 
 router
     .route('/')
@@ -22,9 +28,6 @@ router
 
 
 
-router.get('/top-5-tours', topTours, tourControllers.getAllTours)   //limit=5&sort=-ratingAverages,price
-router.get('/tour-stats', tourControllers.tourStats)                    //aggredation pipeline
-router.get('/monthly-plan/:year', protect, restrictTo(['admin', 'lead-guide', 'guide']), tourControllers.monthlyPlan)
 
 
 

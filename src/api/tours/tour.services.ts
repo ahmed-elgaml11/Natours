@@ -82,3 +82,25 @@ export const monthlyPlan = async (year: number) => {
     ])
     return plan
 }
+
+export const calcDistances = async (lng: string, lat: string, multiplier: number) => {
+    const distances = Tour.aggregate([
+        {
+            $geoNear: {
+                near: {
+                    type:'Point', 
+                    coordinates: [parseFloat(lng) , parseFloat(lat)]
+                },
+                distanceField: 'distance',
+                distanceMultiplier: multiplier
+            }
+        }, 
+        {
+            $project: {
+                distance: 1,
+                name: 1
+            }
+        }
+    ])
+    return distances
+}

@@ -10,8 +10,13 @@ export const validateRequest = (
 ) => {
     return catchAsync(async (req: Request, res: Response, next: NextFunction) => {
         let errors: z.ZodIssue[] = [];
+        if (!Object.keys(req.body).length && req.files || req.file) {
+            return next();
+        }
+
 
         if (fields && fields.length > 0) {
+
             const { body, params } = schema as { body: AnyZodObject; params: AnyZodObject };
 
             if (fields.includes('body')) {
@@ -43,9 +48,6 @@ export const validateRequest = (
             }
         } else {
             const zodSchema = schema as AnyZodObject;
-            if (!Object.keys(req.body).length && req.file) {
-                return next();
-            }
             const result = zodSchema.safeParse({
                 body: req.body,
                 params: req.params,

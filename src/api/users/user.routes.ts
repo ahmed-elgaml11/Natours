@@ -6,12 +6,12 @@ import {  updateMeSchema, getUserSchema, updateUserSchema,} from "./user.schema"
 import {protect, restrictTo } from "../../middlewares/protectRoutes";
 import { getMe } from "../../middlewares/users/getMe";
 import upload from "../../middlewares/upload";
-import { resizeUserPhoto } from '../../middlewares/resizeUserPhoto'
+import { resizeUserPhoto } from '../../middlewares/resizePhoto'
 
 
 router.use(protect)
 
-router.patch('/update-me', upload.single('photo'), resizeUserPhoto, validateRequest(updateMeSchema), userController.updateMe)
+router.patch('/update-me', upload.single('photo'), validateRequest(updateMeSchema), resizeUserPhoto, userController.updateMe)
 router.delete('/delete-me', userController.deleteMe)
 router.get('/me', getMe, userController.getUser)
 

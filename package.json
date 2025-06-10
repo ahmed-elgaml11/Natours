@@ -1,21 +1,19 @@
 {
   "name": "todo",
   "version": "1.0.0",
-  "main": "src/index.ts",
+  "main": "dist/index.js",
   "scripts": {
     "build": "tsc",
     "dev": "tsx watch src/index.ts",
-    "start": "node dis/index.js"
+    "start": "node dist/index.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "description": "",
   "dependencies": {
-    "@types/hpp": "^0.2.6",
-    "@types/morgan": "^1.9.9",
-    "@types/multer": "^1.4.13",
     "bcrypt": "^5.1.1",
+    "cloudinary": "^2.6.1",
     "express": "^4.21.2",
     "express-mongo-sanitize": "^2.2.0",
     "express-rate-limit": "^7.5.0",
@@ -31,7 +29,8 @@
     "tsx": "^4.19.3",
     "validator": "^13.15.0",
     "xss-clean": "^0.1.4",
-    "zod": "^3.24.2"
+    "zod": "^3.24.2",
+    "dotenv": "^16.4.7"
   },
   "devDependencies": {
     "@types/bcrypt": "^5.0.2",
@@ -39,6 +38,9 @@
     "@types/jsonwebtoken": "^9.0.9",
     "@types/nodemailer": "^6.4.17",
     "@types/validator": "^13.15.0",
-    "dotenv": "^16.4.7"
+    "typescript": "^5.8.3",
+    "@types/hpp": "^0.2.6",
+    "@types/morgan": "^1.9.9",
+    "@types/multer": "^1.4.13"
   }
 }

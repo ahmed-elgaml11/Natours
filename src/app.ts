@@ -58,3 +58,12 @@ app.all('*', (req, res, next) => {
 app.use(errorHandler)
 
 export default app;
+
+
+
+
+
+// trust proxy 
+// delete .env 
+// railway 
+

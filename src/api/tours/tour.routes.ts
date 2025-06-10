@@ -9,6 +9,11 @@ import reviewRoutes from '../reviews/review.routes'
 import { uniqueTourName } from "../../middlewares/tours/uniqueName";
 import upload from "../../middlewares/upload";
 import { resizeTourPhoto } from '../../middlewares/resizePhoto'
+import { uploadTourImages } from '../../middlewares/tours/uploadPhotos'
+
+
+
+
 router.get('/top-5-tours', topTours, tourControllers.getAllTours)   //limit=5&sort=-ratingAverages,price
 router.get('/tour-stats', tourControllers.tourStats)                    //aggredation pipeline
 router.get('/monthly-plan/:year', protect, restrictTo(['admin', 'lead-guide', 'guide']), tourControllers.monthlyPlan)
@@ -27,7 +32,8 @@ router
     .patch(protect, restrictTo(['admin', 'lead-guide']), upload.fields([
         {name: 'imageCover', maxCount: 1},
         {name: 'images', maxCount: 3}
-    ]), validateRequest(tourSchema, ['params', 'halfBody']), resizeTourPhoto,  tourControllers.updateTour)
+    ]), validateRequest(tourSchema, ['params', 'halfBody']), resizeTourPhoto, uploadTourImages,  tourControllers.updateTour)
+    
     .delete(protect,  restrictTo(['admin', 'lead-guide']), validateRequest(tourSchema, ['params']),  tourControllers.deleteTour)
 
 

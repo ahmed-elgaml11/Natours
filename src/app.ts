@@ -11,6 +11,8 @@ import helmet from 'helmet'
 import morgan from 'morgan'
 import mongoSantize from 'express-mongo-sanitize'
 import hpp from 'hpp'
+import { cloCon } from './utils/cloudinary'
+cloCon()
 
 
 const app = express();
@@ -41,7 +43,6 @@ app.use(hpp({
 }))
 
 
-
 app.get<{}, firstResponse>('/', (req, res) => {
     res.status(200).json({
         message: 'Hello from the root'
@@ -56,7 +57,6 @@ app.all('*', (req, res, next) => {
     next(new AppError(`Not Found - ${req.originalUrl}`, 404))
 })
 app.use(errorHandler)
-
 export default app;
 
 

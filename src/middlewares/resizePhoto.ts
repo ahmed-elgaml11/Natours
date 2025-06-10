@@ -4,6 +4,7 @@ import fs from 'fs'
 import { catchAsync } from '../utils/catchAsync';
 const uploadDir = 'uploads/img/users';
 const outputDir = 'uploads/img/tours';
+import { cloudinaryUploadImage, cloudinaryRemoveImage } from '../utils/cloudinary'
 
 
 if (!fs.existsSync(uploadDir)) {
@@ -27,35 +28,30 @@ export const resizeUserPhoto = catchAsync(async (req: Request, res: Response, ne
     next()
 })
 export const resizeTourPhoto = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
-
     if (!req.files)
         return next()
 
     if (!Array.isArray(req.files)) {
         if (req.files.imageCover && Array.isArray(req.files.imageCover)) {
-            req.body.imageCover = `tour-${req.params.id}-${Date.now()}-cover.jpeg`;
-
+            const filName = `tour-${req.params.id}-${Date.now()}-cover.jpeg`
+            req.files.imageCover[0].path = `${__dirname}/../../uploads/img/tours/${filName}`;
             await sharp(req.files.imageCover[0].buffer).
                 resize(2000, 1333).
                 toFormat('jpeg').
                 jpeg({ quality: 90 }).
-                toFile(`uploads/img/tours/${req.body.imageCover}`)
-
-
+                toFile(req.files.imageCover[0].path)
 
         }
         if (req.files.images && Array.isArray(req.files.images)) {
-            req.body.images = []
             await Promise.all(
                 req.files.images.map(async (File, i) => {
                     let filName = `tour-${req.params.id}-${Date.now()}-${i + 1}.jpeg`;
+                    File.path = `${__dirname}/../../uploads/img/tours/${filName}`;
                     await sharp(File.buffer).
                         resize(2000, 1333).
                         toFormat('jpeg').
                         jpeg({ quality: 90 }).
                         toFile(`uploads/img/tours/${filName}`)
-                    req.body.images.push(filName)
-
                 })
             )
         }

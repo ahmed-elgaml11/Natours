@@ -1,4 +1,4 @@
-import z, { object } from 'zod'
+import z from 'zod'
 const userBodySchema = z.object({
     name: z.string().min(3, { message: 'Please tell us your name!' }),
     email: z
@@ -6,6 +6,7 @@ const userBodySchema = z.object({
         .min(1, { message: 'Please provide your email' })
         .email({ message: 'Please provide a valid email' }),
     photo: z.string().optional(),
+    photoId: z.string().optional(),
     role: z.enum(['user', 'guide', 'lead-guide', 'admin']).default('user'),
     password: z
         .string()

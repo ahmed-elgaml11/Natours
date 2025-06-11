@@ -41,6 +41,8 @@ app.use(hpp({
         'maxGroupSize'
     ]
 }))
+app.set('view engine', 'ejs');
+app.set('views', 'views')
 
 
 app.get<{}, firstResponse>('/', (req, res) => {

@@ -1,12 +1,11 @@
 import { Request, Response, NextFunction } from 'express';
 import * as Services from './user.services'
 import { userResponce } from '../../types/userResponse';
-import { IUser, IUserInput } from './user.model';
+import { IUserInput } from './user.model';
 import { catchAsync } from '../../utils/catchAsync';
 import { AppError } from '../../utils/appError';
-import { signToken } from '../../utils/jwt';
-import { LoginType, Email, ResetPassword } from './user.schema';
-import { sendEmail } from '../../utils/email';
+import { LoginType, EmailType, ResetPassword } from './user.schema';
+import { Email } from '../../utils/email';
 import crypto from 'crypto'
 
 
@@ -23,6 +22,9 @@ export const signup = catchAsync(async (req: Request<{}, userResponce, IUserInpu
         passwordConfirm: req.body.passwordConfirm,
         passwordChangedAt: req.body.passwordChangedAt
     })
+    const url = `${req.protocol}://${req.get('host')}/api/v1/users/me`
+    await new Email(user, url).sendWelcome()
+
     Services.createSendToken(user, res, 201)
 
 })
@@ -40,7 +42,7 @@ export const login = catchAsync(async (req: Request<{}, userResponce, LoginType>
 
 
 
-export const forgetPassword = catchAsync(async (req: Request<{}, userResponce, Email>, res: Response<userResponce>, next: NextFunction) => {
+export const forgetPassword = catchAsync(async (req: Request<{}, userResponce, EmailType>, res: Response<userResponce>, next: NextFunction) => {
     // 1- get the user 
     const user = await Services.findUser(req.body.email)
     if (!user) {
@@ -54,21 +56,14 @@ export const forgetPassword = catchAsync(async (req: Request<{}, userResponce, E
 
 
     // 3- send a link to the user's email
-    const resetPasswordUrl = `${req.protocol}://${req.get('host')}/api/v1/users/resetPssword/${resetToken}`
-
-    const message = `submit a patch request with the new password and confirm password to: ${resetPasswordUrl}`
 
     try {
-
-        await sendEmail({
-            email: user.email,
-            subject: 'this link is valid for 10 minutes only',
-            message
-        })
+        const resetPasswordUrl = `${req.protocol}://${req.get('host')}/api/v1/auth/resetPassword/${resetToken}`
+        await new Email(user, resetPasswordUrl).sendPasswordReset()
 
         res.status(200).json({
             status: 'success',
-            message: 'the link sent to the email'
+            message: 'the link sent to your email'
         })
 
     }

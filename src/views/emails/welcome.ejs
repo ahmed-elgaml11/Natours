@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <title><%= subject %></title>
+  <style>
+    body {
+      font-family: sans-serif;
+      background-color: #f6f9fc;
+      padding: 2rem;
+      color: #333;
+    }
+    .container {
+      background: #fff;
+      padding: 2rem;
+      border-radius: 8px;
+      max-width: 600px;
+      margin: auto;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    .btn {
+      display: inline-block;
+      margin-top: 1rem;
+      background-color: #28a745;
+      color: white;
+      padding: 0.75rem 1.25rem;
+      text-decoration: none;
+      border-radius: 4px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Welcome, <%= firstName %>!</h1>
+    <p>We’re excited to have you on board. Make suer to upload your photo so we get to know you a little better </p>
+    <a href="<%= url %>" class="btn">Upload Photo</a>
+  </div>
+</body>
+</html>

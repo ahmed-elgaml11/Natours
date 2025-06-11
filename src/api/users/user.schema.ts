@@ -33,7 +33,7 @@ const userEmaildSchema = z.object({
         .email({ message: 'Please provide a valid email' }),
 }).strict()
 
-export type Email = z.infer<typeof userEmaildSchema>
+export type EmailType = z.infer<typeof userEmaildSchema>
 export const userForgetPasswordSchema = z.object({
     body: userEmaildSchema,
     params: z.object({})

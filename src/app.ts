@@ -12,10 +12,20 @@ import morgan from 'morgan'
 import mongoSantize from 'express-mongo-sanitize'
 import hpp from 'hpp'
 import { cloCon } from './utils/cloudinary'
-cloCon()
+import { swaggerSpec } from './utils/swagger';
+import swaggerUi from 'swagger-ui-express';
+
+
 
 
 const app = express();
+
+// setupSwagger(app); 
+
+cloCon()
+
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+
 // set security headers
 app.use(helmet());
 // limit body payload to prevent 'denial of service attack'
@@ -51,21 +61,17 @@ app.get<{}, firstResponse>('/', (req, res) => {
     })
 })
 
-
-
 app.use('/api/v1', api)
 
 app.all('*', (req, res, next) => {
     next(new AppError(`Not Found - ${req.originalUrl}`, 404))
 })
+
 app.use(errorHandler)
+
 export default app;
 
 
 
 
-
-// trust proxy 
-// delete .env 
-// railway 
 

@@ -4,18 +4,21 @@ import { AppError } from "./appError";
 import * as tourServices from '../api/tours/tour.services'
 import * as userServices from '../api/users/user.services'
 import * as reviewServices from '../api/reviews/review.services'
+import * as bookingServices from '../api/bookings/booking.services'
 import { IReview } from '../api/reviews/review.model'
 import { IUserInput } from '../api/users/user.model'
 import { ITour } from '../api/tours/tour.model'
 import { APIFeatures } from './queryFeatures'
 import { Query } from "mongoose";
+import { IBooking } from "../api/bookings/booking.model";
 
 
-type ModelName = 'tour' | 'user' | 'review'
+type ModelName = 'tour' | 'user' | 'review' | 'booking'
 type ModelTypeMap = {
     tour: ITour;
     user: IUserInput;
     review: IReview;
+    booking: IBooking
 };
 interface ServiceType<T> {
     getAll: (filter: Object) => Query<any, any>
@@ -27,7 +30,8 @@ interface ServiceType<T> {
 const serviceMap: { [k in ModelName]: ServiceType<ModelTypeMap[k]> } = {
     tour: tourServices,
     user: userServices,
-    review: reviewServices
+    review: reviewServices,
+    booking: bookingServices
 }
 
 export const getAll = (model: ModelName) =>

@@ -1,7 +1,6 @@
 import mongoose from "mongoose";
 import { Query } from "mongoose";
 import slugify from "slugify";
-import { number } from "zod";
 
 
 type Location = {

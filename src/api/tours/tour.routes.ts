@@ -10,6 +10,8 @@ import { uniqueTourName } from "../../middlewares/tours/uniqueName";
 import upload from "../../middlewares/upload";
 import { resizeTourPhoto } from '../../middlewares/resizePhoto'
 import { uploadTourImages } from '../../middlewares/tours/uploadPhotos'
+import { createBookingCheckout } from '../../middlewares/bookings/createBooking'
+import bookingRoutes from '../bookings/booking.routes'
 
 
 
@@ -21,9 +23,11 @@ router.get('/monthly-plan/:year', protect, restrictTo(['admin', 'lead-guide', 'g
 router.get('/tours-within/:distance/center/:latlng/unit/:unit', tourControllers.getToursWithin)
 router.get('/distances/:latlng/unit/:unit', tourControllers.getDistances)
 
+router.get('/my-tours', protect, tourControllers.getMyTours)
+
 router
     .route('/')
-    .get(tourControllers.getAllTours)
+    .get(createBookingCheckout, tourControllers.getAllTours)
     .post(protect, restrictTo(['admin', 'lead-guide']), validateRequest(tourSchema, ['body']), uniqueTourName, tourControllers.addTour)
 
 router
@@ -42,6 +46,7 @@ router
 
 
 router.use('/:tourId/reviews', reviewRoutes)
+router.use('/:tourId/bookings', bookingRoutes)
 
 
 export default router

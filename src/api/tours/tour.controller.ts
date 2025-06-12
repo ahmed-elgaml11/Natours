@@ -1,10 +1,11 @@
-import { Request, Response, NextFunction, json } from 'express';
+import { Request, Response, NextFunction } from 'express';
 import { catchAsync } from '../../utils/catchAsync';
 import { toursResponse } from '../../types/toursResponse';
 import * as tourServices from './tour.services'
 import * as factory from '../../utils/handlerFactory'
 import { AppError } from '../../utils/appError';
-
+import * as bookingServices from '../bookings/booking.services'
+import { Tour } from './tour.model';
 
 
 export const getAllTours = factory.getAll('tour')
@@ -52,13 +53,13 @@ export const getToursWithin = catchAsync(async (req: Request, res: Response, nex
 
     const radius: number = unit === 'mi' ? parseFloat(distance) / 3963.2 : parseFloat(distance) / 6378.1
 
-    const tours = await tourServices.getAll({ 
+    const tours = await tourServices.getAll({
         startLocation: {
             $geoWithin: {
                 $centerSphere: [[lng, lat], radius]
             }
         }
-     })
+    })
 
     res.status(200).json({
         status: 'success',
@@ -89,3 +90,19 @@ export const getDistances = catchAsync(async (req: Request, res: Response, next:
         }
     })
 })
+
+
+export const getMyTours = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+    const bookings = await bookingServices.getAll({ user: req.user?.id })
+
+    const tourIds = bookings.map(ele => ele.tour)
+    const tours = await Tour.find({ _id: { $in: tourIds } })
+
+    res.status(200).json({
+        status: 'success',
+        data: {
+            tours
+        }
+    })
+
+}) 

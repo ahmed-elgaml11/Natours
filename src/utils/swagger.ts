@@ -30,6 +30,5 @@ const swaggerDefinition = {
 };
 
 const apis = [path.join(__dirname, '../../src/docs/**/*.ts')];
-console.log('Using API path:', apis);
 
 export const swaggerSpec = swaggerJsdoc({ swaggerDefinition, apis });

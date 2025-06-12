@@ -6,6 +6,13 @@ A full-featured Tour Booking API built with **Node.js**, **Express**, **TypeScri
 
 ## 🚀 Features
 
+## 🔐 Authentication & Authorization
+
+- JWT-based authentication (stateless)
+- Sign up, log in, forgot/reset, update password
+- Role-based access control: `user`, `guide`, `lead-guide`, `admin`
+- Protected routes via middleware
+
 ### 🏕️ Tours
 - CRUD operations (admin/lead-guide only)
 - API FEATURES: Filtering, sorting, pagination, field selection
@@ -45,7 +52,7 @@ A full-featured Tour Booking API built with **Node.js**, **Express**, **TypeScri
 - Helmet, rate limiting, prevent parameter pollution
 - Data sanitization: NoSQL injection & XSS
 
-### Design Patterns
+### 🧱 Design Patterns
 - Handler Factory 
 ---
 

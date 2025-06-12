@@ -25,15 +25,15 @@ export class Email {
 // 1- create transporter: object responsible for sending emails. It contains the configuration details that tell Nodemailer how to connect to an email service provider'smtp'
 
     newTransport() {
-        // if (process.env.NODE_ENV == 'production') {
-        //     return nodemailer.createTransport({
-        //         service: 'SendGrid',
-        //         auth: {
-        //             user: process.env.SENDGRID_USERNAME,
-        //             pass: process.env.SENDGRID_PASSWORD
-        //         }
-        //     });
-        // }
+        if (process.env.NODE_ENV == 'production') {
+            return nodemailer.createTransport({
+                service: 'gmail',
+                auth: {
+                    user: process.env.GMAIL_USERNAME,
+                    pass: process.env.GMAIL_PASSWORD
+                }
+            });
+        }
         return nodemailer.createTransport({
             host: process.env.EMAIL_HOST,
             port: Number(process.env.EMAIL_PORT),

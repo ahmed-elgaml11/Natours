@@ -15,6 +15,15 @@ export const signToken = (payload: payloadDate) => {
     expiresIn: JWT_EXPIRESIN
   } as SignOptions)
 }
+export const generateRefreshToken = (payload: payloadDate) => {
+  const { JWT_REFRESH_EXPIRESIN, JWT_REFRESH_SECRET } = process.env;
+  if (!JWT_REFRESH_SECRET || !JWT_REFRESH_EXPIRESIN) {
+    throw new AppError('JWT env variables are not defined', 500)
+  }
+  return jwt.sign(payload, JWT_REFRESH_SECRET, {
+    expiresIn: JWT_REFRESH_EXPIRESIN
+  } as SignOptions)
+}
 
 const verify = promisify(jwt.verify) as (token: string, secret: string) => Promise<JwtPayload>;
 

@@ -2,9 +2,11 @@ import { Request, Response, NextFunction } from 'express';
 import { IUser, IUserInput, User } from "./user.model"
 import { signToken } from '../../utils/jwt';
 import { AppError } from '../../utils/appError';
+import { generateRefreshToken } from '../../utils/jwt'
+import { RefreshToken } from './refreshToken.model';
 
 export const getAll = (filter: object) => {
-    return  User.find(filter);
+    return User.find(filter);
 }
 
 export const createOne = async (body: IUserInput) => {
@@ -19,11 +21,11 @@ export const getOneById = async (id: string) => {
     return await User.findById(id)
 }
 
-export const deleteOne = async (id: string ) => {
+export const deleteOne = async (id: string) => {
     return await User.findByIdAndDelete(id)
 }
 
-export const updateOne = async (id: string, body: Partial<IUser> ) => {
+export const updateOne = async (id: string, body: Partial<IUser>) => {
     return await User.findByIdAndUpdate(id, body, {
         new: true,
     })
@@ -60,12 +62,13 @@ export const updateData = async<T>(id: string, data: Partial<T>) => {
 
 
 export const inActiveUser = async (id: string) => {
-    await User.findByIdAndUpdate(id , { isActive: false })
+    await User.findByIdAndUpdate(id, { isActive: false })
 }
 
 
 export const createSendToken = (user: IUser, res: Response, status: number) => {
     const token = signToken({ id: user._id })
+
     const cookieExpiresIn = process.env.COOKIE_EXPIRESIN
     if (!cookieExpiresIn) throw new AppError('missing env vars: COOKIE_EXPIRESIN ', 400)
 
@@ -78,15 +81,33 @@ export const createSendToken = (user: IUser, res: Response, status: number) => {
     }
     if (process.env.NODE_ENV === 'production') cookieOptions.secure = true
 
-
-    user.password = undefined as unknown as string
     res.cookie('jwt', token, cookieOptions)
+    user.password = undefined as unknown as string
+
     res.status(status).json({
         status: 'success',
         token: token,
         data: {
             user
         }
+    })
+
+}
+
+export const createRereshToken = (user: IUser, res: Response) => {
+    const refreshToken = generateRefreshToken({ id: user.id });
+    res.cookie('refreshToken', refreshToken, {
+        httpOnly: true,
+        secure: true,
+        sameSite: 'strict',
+        path: '/api/v1/auth/refresh-token',
+        maxAge: 7*24*60*60*1000
+    });
+
+    RefreshToken.create({
+        user: user._id,
+        token: refreshToken,
+        expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
     })
 
 }

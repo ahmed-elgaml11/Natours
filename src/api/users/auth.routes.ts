@@ -14,4 +14,7 @@ router.patch('/resetPassword/:token', validateRequest(createResetPasswordSchema)
 
 router.patch('/updateMyPassword', validateRequest(createUpdatePasswordSchema), protect, authController.updateMyPassword)
 
+
+router.post('/refresh-token', authController.refreshToken)
+router.post('/logout', authController.refreshToken)
 export default router

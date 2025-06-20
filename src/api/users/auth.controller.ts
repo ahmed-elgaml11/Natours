@@ -1,12 +1,14 @@
 import { Request, Response, NextFunction } from 'express';
 import * as Services from './user.services'
 import { userResponce } from '../../types/userResponse';
-import { IUserInput } from './user.model';
+import { IUserInput, User } from './user.model';
 import { catchAsync } from '../../utils/catchAsync';
 import { AppError } from '../../utils/appError';
 import { LoginType, EmailType, ResetPassword } from './user.schema';
 import { Email } from '../../utils/email';
 import crypto from 'crypto'
+import { RefreshToken } from './refreshToken.model';
+import { signToken, verifyToken, generateRefreshToken } from '../../utils/jwt'
 
 
 
@@ -25,6 +27,7 @@ export const signup = catchAsync(async (req: Request<{}, userResponce, IUserInpu
     const url = `${req.protocol}://${req.get('host')}/api/v1/users/me`
     await new Email(user, url).sendWelcome()
 
+    Services.createRereshToken(user, res)
     Services.createSendToken(user, res, 201)
 
 })
@@ -37,9 +40,42 @@ export const login = catchAsync(async (req: Request<{}, userResponce, LoginType>
     if (!user || !(await user.correctPassword(password, user.password))) {
         throw new AppError('Incorrect email or password', 401)
     }
+
+    Services.createRereshToken(user, res)
     Services.createSendToken(user, res, 200)
 })
 
+export const refreshToken = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+    const oldRefreshToken = req.cookies.refreshToken;
+    if (!oldRefreshToken) return next(new AppError('Please Log in to get the refresh token', 401));
+
+    const payload = await verifyToken(oldRefreshToken); 
+    const storedToken = await RefreshToken.findOne({ user: payload.id, token: oldRefreshToken });
+    if (!storedToken) return next(new AppError('this token is not issued!!', 403));
+
+    await RefreshToken.findOneAndDelete({ id: payload.id, token: oldRefreshToken })
+    const user = await Services.getOneById(payload.id)
+    if (!user) return next(new AppError('this user is not existed!!', 403));
+
+    const newAccessToken = signToken({ id: payload.id });
+    Services.createRereshToken(user, res)
+    res.status(200).json({ accessToken: newAccessToken });
+
+});
+
+export const logout = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+    const token = req.cookies.refreshToken;
+    if (token) {
+        await RefreshToken.deleteOne({ token });
+    }
+    res.clearCookie('refreshToken', { path: '/api/v1/auth/refresh-token' });
+    res.status(204).json({
+        status: 'success',
+        data: {
+
+        }
+    });
+});
 
 
 export const forgetPassword = catchAsync(async (req: Request<{}, userResponce, EmailType>, res: Response<userResponce>, next: NextFunction) => {

@@ -14,6 +14,7 @@ import hpp from 'hpp'
 import { cloCon } from './utils/cloudinary'
 import { swaggerSpec } from './utils/swagger';
 import swaggerUi from 'swagger-ui-express';
+import cros from 'cors'
 
 
 
@@ -25,6 +26,12 @@ const app = express();
 cloCon()
 
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+
+app.use(cros({
+    origin: 'http://127.0.0.1:5500',
+    methods: ['GET', 'POST', 'PATCH', 'DELETE'],
+    credentials: true
+}))
 
 // set security headers
 app.use(helmet());

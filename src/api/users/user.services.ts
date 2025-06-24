@@ -94,17 +94,17 @@ export const createSendToken = (user: IUser, res: Response, status: number) => {
 
 }
 
-export const createRereshToken = (user: IUser, res: Response) => {
-    const refreshToken = generateRefreshToken({ id: user.id });
+export const createRereshToken = async (user: IUser, res: Response) => {
+    const refreshToken = generateRefreshToken({ id: user._id });
     res.cookie('refreshToken', refreshToken, {
         httpOnly: true,
         secure: true,
         sameSite: 'strict',
         path: '/api/v1/auth/refresh-token',
-        maxAge: 7*24*60*60*1000
+        maxAge: 7 * 24 * 60 * 60 * 1000
     });
 
-    RefreshToken.create({
+    await RefreshToken.create({
         user: user._id,
         token: refreshToken,
         expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)

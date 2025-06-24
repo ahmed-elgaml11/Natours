@@ -15,13 +15,14 @@ import { cloCon } from './utils/cloudinary'
 import { swaggerSpec } from './utils/swagger';
 import swaggerUi from 'swagger-ui-express';
 import cros from 'cors'
+import cookieParser from 'cookie-parser';
 
 
 
 
 const app = express();
 
-// setupSwagger(app); 
+app.use(cookieParser()); 
 
 cloCon()
 
@@ -37,7 +38,7 @@ app.use(cros({
 app.use(helmet());
 // limit body payload to prevent 'denial of service attack'
 app.use(express.json({ limit: '20kb' }));
-// limit the number of request for the same id per windwo
+// limit the number of request for the same ip per window
 const limiter = rateLimit({
     windowMs: 15 * 60 * 1000,
     limit: 100, // Limit each IP to 100 requests per `window` (here, per 15 minutes).

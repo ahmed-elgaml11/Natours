@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { catchAsync } from '../utils/catchAsync';
 import { AppError } from '../utils/appError';
-import { verifyToken } from '../utils/jwt';
+import { verifySignToken } from '../utils/jwt';
 import { getOneById } from '../api/users/user.services';
 export const protect = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
     // 1- check if there is a token and get it
@@ -14,7 +14,7 @@ export const protect = catchAsync(async (req: Request, res: Response, next: Next
     }
 
     // 2- verify token that it is (not tampered or expired)
-    const decoded = await verifyToken(token)
+    const decoded = await verifySignToken(token)
 
 
     // 3- check if the user still exists (if a customer blocked or fired or removed from the db)

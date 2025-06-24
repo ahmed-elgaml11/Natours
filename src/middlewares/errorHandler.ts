@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import { errorResponse, CustomError } from '../types/errorResponse';
 import { AppError } from '../utils/appError';
 
+
 const handleCastErrorDb = (err: CustomError) => {
     const message = `invalid ${err.path}: ${err.value}`
     return new AppError(message, 400);
@@ -18,10 +19,15 @@ const handleValidationErrorDb = (err: CustomError) => {
 
 }
 
+
+
 const handleJwtError = () => new AppError('invalid token, please log in again', 401)
 const handleExpiredJWT = () => {
-    return new AppError('your token has expired please lo in again', 401)
+    return new AppError('your token has expired please log in again', 401)
 }
+
+
+
 const sendErrorDev = (err: CustomError, res: Response<errorResponse>) => {
     res.status(err.statusCode);
     res.json({
@@ -64,6 +70,8 @@ const errorHandler = (err: CustomError, req: Request, res: Response<errorRespons
         
     } else if (process.env.NODE_ENV === 'development') {
         if (err.name === 'JsonWebTokenError') err = handleJwtError()
+        if (err.name === 'TokenExpiredError') err = handleExpiredJWT()
+
         sendErrorDev(err, res)
     }
 };

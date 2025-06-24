@@ -8,7 +8,7 @@ import { LoginType, EmailType, ResetPassword } from './user.schema';
 import { Email } from '../../utils/email';
 import crypto from 'crypto'
 import { RefreshToken } from './refreshToken.model';
-import { signToken, verifyToken, generateRefreshToken } from '../../utils/jwt'
+import { generateRefreshToken, signToken, verifyRefreshToken } from '../../utils/jwt'
 
 
 
@@ -49,11 +49,12 @@ export const refreshToken = catchAsync(async (req: Request, res: Response, next:
     const oldRefreshToken = req.cookies.refreshToken;
     if (!oldRefreshToken) return next(new AppError('Please Log in to get the refresh token', 401));
 
-    const payload = await verifyToken(oldRefreshToken); 
-    const storedToken = await RefreshToken.findOne({ user: payload.id, token: oldRefreshToken });
+    const payload = await verifyRefreshToken(oldRefreshToken); 
+
+    const storedToken =  await RefreshToken.findOneAndDelete({ user: payload.id, token: oldRefreshToken })
     if (!storedToken) return next(new AppError('this token is not issued!!', 403));
 
-    await RefreshToken.findOneAndDelete({ id: payload.id, token: oldRefreshToken })
+    
     const user = await Services.getOneById(payload.id)
     if (!user) return next(new AppError('this user is not existed!!', 403));
 

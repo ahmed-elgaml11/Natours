@@ -110,6 +110,7 @@ export const forgetPassword = catchAsync(async (req: Request<{}, userResponce, E
         user.passwordResetExpires = undefined
 
         await user.save({ validateBeforeSave: false })
+        console.log(err)
 
         return next(new AppError('there is an error sending the email', 500))
 

@@ -48,7 +48,7 @@ app.use('/api', limiter)
 // data sanitization against query injection
 app.use(mongoSantize())
 // request logger 
-if (process.env.NODE_ENV === 'development') app.use(morgan('dev'))
+app.use(morgan('dev'))
 
 // prevent parameter pollution
 app.use(hpp({

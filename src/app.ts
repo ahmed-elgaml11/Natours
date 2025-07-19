@@ -22,6 +22,17 @@ import cookieParser from 'cookie-parser';
 
 const app = express();
 
+
+app.get<{}, firstResponse>('/', (req, res) => {
+    res.status(200).json({
+        message: 'Hello from the root'
+    })
+})
+
+
+
+
+
 app.use(cookieParser()); 
 
 cloCon()
@@ -29,7 +40,7 @@ cloCon()
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 app.use(cros({
-    origin: 'http://127.0.0.1:5500',
+    origin: '*',
     methods: ['GET', 'POST', 'PATCH', 'DELETE'],
     credentials: true
 }))
@@ -62,20 +73,15 @@ app.use(hpp({
 app.set('view engine', 'ejs');
 app.set('views', 'views')
 
-
-app.get<{}, firstResponse>('/', (req, res) => {
-    res.status(200).json({
-        message: 'Hello from the root'
-    })
-})
-
 app.use('/api/v1', api)
-
 app.all('*', (req, res, next) => {
     next(new AppError(`Not Found - ${req.originalUrl}`, 404))
 })
-
 app.use(errorHandler)
+
+
+
+
 
 export default app;
 

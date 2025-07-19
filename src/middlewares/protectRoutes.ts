@@ -3,6 +3,8 @@ import { catchAsync } from '../utils/catchAsync';
 import { AppError } from '../utils/appError';
 import { verifySignToken } from '../utils/jwt';
 import { getOneById } from '../api/users/user.services';
+import { ITour } from '../api/tours/tour.model';
+
 export const protect = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
     // 1- check if there is a token and get it
     let token;
@@ -45,3 +47,20 @@ export const restrictTo = (roles: ('user' | 'guide' | 'lead-guide' | 'admin')[])
         next()
     }
 }
+
+
+// unused code for ABAC,  just for learning
+type Project = null
+export const authorize = (policy: Function, resource: Project) => (req: Request, res: Response, next: NextFunction) => {
+    const user = req.user
+    if(policy(user, resource)){
+        return next()
+    }
+    return next(new AppError('Access Denied', 403))
+
+}
+// and we will write inside the controller route handller: 
+
+// authorize(canViewProject, project)(req, res, () => {
+
+// })

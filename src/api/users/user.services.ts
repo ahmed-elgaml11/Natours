@@ -4,6 +4,7 @@ import { signToken } from '../../utils/jwt';
 import { AppError } from '../../utils/appError';
 import { generateRefreshToken } from '../../utils/jwt'
 import { RefreshToken } from './refreshToken.model';
+import crypto from 'crypto'
 
 export const getAll = (filter: object) => {
     return User.find(filter);
@@ -34,6 +35,9 @@ export const updateOne = async (id: string, body: Partial<IUser>) => {
 
 export const findUserByToken = async (token: string) => {
     return User.findOne({ PasswordResetToken: token, passwordResetExpires: { $gt: new Date(Date.now()) } })
+}
+export const findUserByWelcomeToken = async (token: string) => {
+    return User.findOne({ welcomeToken: token, welcomeTokenExpires: { $gt: new Date(Date.now()) } })
 }
 
 export const findUserWithPassById = async (id: string) => {
@@ -93,14 +97,30 @@ export const createSendToken = (user: IUser, res: Response, status: number) => {
     })
 
 }
+export const createSignToken = (user: IUser, res: Response) => {
+    const token = signToken({ id: user._id })
 
+    const cookieExpiresIn = process.env.COOKIE_EXPIRESIN
+    if (!cookieExpiresIn) throw new AppError('missing env vars: COOKIE_EXPIRESIN ', 400)
+
+    const cookieOptions = {
+        expires: new Date(
+            Date.now() + (Number(cookieExpiresIn) * 24 * 60 * 60 * 1000)
+        ),
+        httpOnly: true,
+        secure: false
+    }
+    if (process.env.NODE_ENV === 'production') cookieOptions.secure = true
+
+    res.cookie('jwt', token, cookieOptions)
+
+}
 export const createRereshToken = async (user: IUser, res: Response) => {
     const refreshToken = generateRefreshToken({ id: user._id });
     res.cookie('refreshToken', refreshToken, {
         httpOnly: true,
         secure: true,
         sameSite: 'strict',
-        path: '/api/v1/auth/refresh-token',
         maxAge: 7 * 24 * 60 * 60 * 1000
     });
 
@@ -110,4 +130,8 @@ export const createRereshToken = async (user: IUser, res: Response) => {
         expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
     })
 
+}
+
+export const hashToken = (token: string) => {
+    return crypto.createHash('sha256').update(token).digest('hex')
 }

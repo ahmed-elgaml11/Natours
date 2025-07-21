@@ -8,7 +8,7 @@ import { LoginType, EmailType, ResetPassword } from './user.schema';
 import { Email } from '../../utils/email';
 import crypto from 'crypto'
 import { RefreshToken } from './refreshToken.model';
-import { generateRefreshToken, signToken, verifyRefreshToken } from '../../utils/jwt'
+import { signToken, verifyRefreshToken } from '../../utils/jwt'
 
 
 
@@ -22,15 +22,70 @@ export const signup = catchAsync(async (req: Request<{}, userResponce, IUserInpu
         email: req.body.email,
         password: req.body.password,
         passwordConfirm: req.body.passwordConfirm,
-        passwordChangedAt: req.body.passwordChangedAt
+        passwordChangedAt: req.body.passwordChangedAt,
+        emailVerified: false
     })
-    const url = `${req.protocol}://${req.get('host')}/api/v1/users/me`
-    await new Email(user, url).sendWelcome()
+    const { redirectedTo } = req.body || '';
+
+    const welcomeToken = user.createWelcomeToken()
+    await user.save({ validateBeforeSave: false })
+
+    const host = process.env.NODE_ENV === 'development' ? process.env.DEVELOPMENT_BASE_URL : process.env.PRODUCTION_BASE_URL
+    const url = `${req.protocol}://${host}/api/v1/users/verify/${welcomeToken}?redirectedTo=${redirectedTo}`
+
+    try {
+        await new Email(user, url).sendWelcome();
+        res.status(201).json({
+            status: 'success',
+            message: 'the verfication mail sent to your email'
+        })
+
+    } catch (err) {
+        console.error('Sending Email failed:', err);
+        await Services.deleteOne(user.id);
+        return next(new AppError('something went wrong in sending email, please register again.', 500));
+    }
+})
+
+
+
+export const verify = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+    const token = req.params.token
+    const redirectedTo = req.query.redirectedTo as string || '';
+    const hashedToken = Services.hashToken(token)
+    const user = await Services.findUserByWelcomeToken(hashedToken)
+
+    if (!user) {
+        return next(new AppError('Invalid Or Expired Token', 400))
+    }
+    const allowedRedirects = [
+        '/',
+        '/',
+        '/'
+    ]
+
+    let finalRedirect;
+    if (allowedRedirects.includes(redirectedTo)) {
+        finalRedirect = redirectedTo
+    } else {
+        return next(new AppError('invalid path', 400));
+    }
+
+    user.welcomeToken = undefined;
+    user.welcomeTokenExpires = undefined;
+    user.emailVerified = true;
+    await user.save({ validateBeforeSave: false });
+
+
 
     Services.createRereshToken(user, res)
-    Services.createSendToken(user, res, 201)
+    Services.createSignToken(user, res)
+    res.redirect(finalRedirect)
+
 
 })
+
+
 
 export const login = catchAsync(async (req: Request<{}, userResponce, LoginType>, res: Response<userResponce>, next: NextFunction) => {
     const { email, password } = req.body;
@@ -41,6 +96,11 @@ export const login = catchAsync(async (req: Request<{}, userResponce, LoginType>
         throw new AppError('Incorrect email or password', 401)
     }
 
+    if (!user.emailVerified) {
+        throw new AppError('Please verify your email before logging in.', 401);
+    }
+
+
     Services.createRereshToken(user, res)
     Services.createSendToken(user, res, 200)
 })
@@ -49,12 +109,12 @@ export const refreshToken = catchAsync(async (req: Request, res: Response, next:
     const oldRefreshToken = req.cookies.refreshToken;
     if (!oldRefreshToken) return next(new AppError('Please Log in to get the refresh token', 401));
 
-    const payload = await verifyRefreshToken(oldRefreshToken); 
+    const payload = await verifyRefreshToken(oldRefreshToken);
 
-    const storedToken =  await RefreshToken.findOneAndDelete({ user: payload.id, token: oldRefreshToken })
+    const storedToken = await RefreshToken.findOneAndDelete({ user: payload.id, token: oldRefreshToken })
     if (!storedToken) return next(new AppError('this token is not issued!!', 403));
 
-    
+
     const user = await Services.getOneById(payload.id)
     if (!user) return next(new AppError('this user is not existed!!', 403));
 
@@ -95,7 +155,7 @@ export const forgetPassword = catchAsync(async (req: Request<{}, userResponce, E
     // 3- send a link to the user's email
 
     try {
-        const host = process.env.NODE_ENV === 'development' ? process.env.DEVELOPMENT_BASE_URL: process.env.PRODUCTION_BASE_URL
+        const host = process.env.NODE_ENV === 'development' ? process.env.DEVELOPMENT_BASE_URL : process.env.PRODUCTION_BASE_URL
         const resetPasswordUrl = `${req.protocol}://${host}/api/v1/auth/resetPassword/${resetToken}`
         await new Email(user, resetPasswordUrl).sendPasswordReset()
 
@@ -120,7 +180,7 @@ export const forgetPassword = catchAsync(async (req: Request<{}, userResponce, E
 export const resetPassword = catchAsync(async (req: Request<{ token: string }, userResponce, ResetPassword>, res: Response<userResponce>, next: NextFunction) => {
     //1- get the user based on the token
     const token = req.params.token
-    const hashedToken = crypto.createHash('sha256').update(token).digest('hex')
+    const hashedToken = Services.hashToken(token)
     const user = await Services.findUserByToken(hashedToken)
 
 
@@ -137,7 +197,9 @@ export const resetPassword = catchAsync(async (req: Request<{ token: string }, u
 
 
     // 3- log he user in (send jwt)
+    Services.createRereshToken(user, res)
     Services.createSendToken(user, res, 200)
+
 
 })
 

@@ -70,7 +70,7 @@ export class Email {
     }
 
     async sendWelcome() {
-        await this.send('welcome', 'Welcome To The Natours World')
+        await this.send('welcome', 'Welcome To The Natours World, Please verify your Email (valid for only 6 hours)')
     }
     async sendPasswordReset() {
         await this.send('passwordReset', 'Your password reset token (valid for only 10 minutes)');

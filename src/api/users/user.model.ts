@@ -16,8 +16,12 @@ export interface IUser extends Document  {
     changePasswordAfter: (tokenTime: number) => boolean
     PasswordResetToken?: string
     passwordResetExpires?: Date
-    createPasswordRestetToken: () => string
-    isActive?: boolean
+    welcomeToken?: string
+    welcomeTokenExpires?: Date
+    createPasswordRestetToken: () => string,
+    createWelcomeToken: () => string,
+    isActive?: boolean,
+    emailVerified?: boolean
 }
 export interface IUserInput {
     name: string;
@@ -27,6 +31,8 @@ export interface IUserInput {
     password: string;
     passwordConfirm: string;
     passwordChangedAt?: Date,
+    emailVerified?: boolean,
+    redirectedTo?: string
 }
 
 const userSchema = new mongoose.Schema<IUser>({
@@ -79,7 +85,16 @@ const userSchema = new mongoose.Schema<IUser>({
         type: Boolean,
         default: true,
         select: false
+    },
+
+    welcomeToken: String,
+    
+    welcomeTokenExpires: Date,
+    emailVerified: {
+        type: Boolean,
+        default: false,
     }
+
 })
 userSchema.pre('save', async function (next) {
     if (!this.isModified('password')) return next();
@@ -122,9 +137,19 @@ userSchema.methods.createPasswordRestetToken = function(){
 
     this.PasswordResetToken = crypto.createHash('sha256').update(resetToken).digest('hex');
 
-    this.passwordResetExpires = Date.now() + 10 * 60 * 1000
+    this.passwordResetExpires = Date.now() + 10 * 60 * 1000   // 10 minutes
 
     return resetToken;
+
+}
+userSchema.methods.createWelcomeToken = function(){
+    const token = crypto.randomBytes(32).toString('hex'); 
+
+    this.welcomeToken = crypto.createHash('sha256').update(token).digest('hex');
+
+    this.welcomeTokenExpires = Date.now() + 6 * 60 * 60 * 1000  // 6 hours
+
+    return token;
 
 }
 
